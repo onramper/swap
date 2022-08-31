@@ -1,0 +1,46 @@
+.wrapper {
+  display: flex;
+  overflow-y: hidden;
+}
+
+.text-error {
+  font-size: 12px;
+  line-height: 15px;
+  letter-spacing: 0.08px;
+  color: var(--error-color);
+}
+
+.err-icon {
+  margin-right: 6px;
+  margin-top: 2px;
+}
+
+.wrapper.warning .err-icon {
+  display: none;
+}
+
+.wrapper.warning .text-error {
+  color: var(--warning-color);
+}
+
+.collapse-enter {
+  max-height: 0px;
+  opacity: 0;
+}
+
+.collapse-enter-active {
+  max-height: 1000px;
+  opacity: 1;
+  transition: max-height 200ms linear, opacity 200ms linear;
+}
+
+.collapse-exit {
+  max-height: 1000px;
+  opacity: 1;
+}
+
+.collapse-exit-active {
+  max-height: 0px;
+  opacity: 0;
+  transition: max-height 200ms linear, opacity 200ms linear;
+}
