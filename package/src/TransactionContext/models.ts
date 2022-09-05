@@ -20,4 +20,5 @@ export interface StateType {
   transactionRequest: providers.TransactionRequest | null;
   customerGateway: string;
   selectedWalletAddress?: string;
+  isSupportedNetwork: boolean;
 }

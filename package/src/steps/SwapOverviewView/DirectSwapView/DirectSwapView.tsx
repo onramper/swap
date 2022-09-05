@@ -1,75 +1,81 @@
-import React, {
-  useCallback,
-  useContext,
-  useEffect,
-  useRef,
-  useState,
-} from "react";
-import { NavContext, useNav } from "../../../NavContext";
-import { DirectSwapViewProps } from "./DirectSwapView.models";
-import commonClasses from "../../../styles.module.css";
-import inputClasses from "../../../common/InputDropdown/InputDropdown.module.css";
-import ProgressHeader from "../../../common/Header/ProgressHeader/ProgressHeader";
-import Footer from "../../../common/Footer";
+import React, { useCallback, useEffect, useRef, useState } from "react";
+import { useEtherBalance, useTokenBalance } from "@usedapp/core";
+import { isMetamaskEnabled } from "layer2";
+import { nanoid } from "nanoid";
+import { useDebouncedCallback } from "use-debounce";
+import { ItemType } from "../../../ApiContext";
+import Breakdown from "../../../common/Breakdown/Breakdown";
 import { ButtonAction } from "../../../common/Buttons";
+import Footer from "../../../common/Footer";
+import ProgressHeader from "../../../common/Header/ProgressHeader/ProgressHeader";
 import Heading from "../../../common/Heading/Heading";
 import InputDropdown from "../../../common/InputDropdown/InputDropdown";
+import inputClasses from "../../../common/InputDropdown/InputDropdown.module.css";
+import OverlayPicker from "../../../common/OverlayPicker/OverlayPicker";
+import { useConnectWallet, useWalletSupportRedirect } from "../../../hooks";
+import { useNav } from "../../../NavContext";
+import {
+  NotificationType,
+  useWidgetNotifications,
+} from "../../../NotificationContext";
+import commonClasses from "../../../styles.module.css";
+import {
+  useTransactionContext,
+  useTransactionCtxActions,
+} from "../../../TransactionContext/hooks";
+import { useExecuteTransaction } from "../../../TransactionContext/hooks/useExecuteTransaction";
+import { useGetTokens } from "../../../TransactionContext/hooks/useGetTokens";
+import { useUpdateQuote } from "../../../TransactionContext/hooks/useUpdateQuote";
 import {
   formatTokenAmount,
   onChangeFloat,
   trimLargeNumber,
 } from "../../../utils";
-import Breakdown from "../../../common/Breakdown/Breakdown";
-import TransactionSettings from "../TransactionSettings/TransactionSettings";
-import classes from "./DirectSwapView.module.css";
-import { useEtherBalance, useTokenBalance } from "@usedapp/core";
-import { useDebouncedCallback } from "use-debounce";
-import {
-  useTransactionContext,
-  useTransactionCtxActions,
-} from "../../../TransactionContext/hooks";
-import { utils } from "ethers";
 import { useLayer2 } from "../../../web3/config";
-import { isMetamaskEnabled } from "layer2";
-import { useUpdateQuote } from "../../../TransactionContext/hooks/useUpdateQuote";
 import {
   SingleNotification,
   WidgetNotification,
 } from "../../WidgetNotification/WidgetNotification";
-import {
-  NotificationType,
-  useWidgetNotifications,
-} from "../../../NotificationContext";
-import { nanoid } from "nanoid";
-import { useGetTokens } from "../../../TransactionContext/hooks/useGetTokens";
-import { ItemType } from "../../../ApiContext";
-import OverlayPicker from "../../../common/OverlayPicker/OverlayPicker";
-import { useConnectWallet, useWalletSupportRedirect } from "../../../hooks";
-import { useExecuteTransaction } from "../../../TransactionContext/hooks/useExecuteTransaction";
+import TransactionSettings from "../TransactionSettings/TransactionSettings";
+import { DirectSwapViewProps } from "./DirectSwapView.models";
+import classes from "./DirectSwapView.module.css";
+import { Token } from "../../../web3/lifi";
+import { defaultChainId } from "../../../web3/constants";
 
 const insufficientFundsError =
   "You have insufficient funds to complete this transaction";
 
 const DirectSwapView: React.FC<DirectSwapViewProps> = (props) => {
   const [swapErrorMessage, setSwapErrorMessage] = useState<string>();
-  const { account } = useLayer2();
   const { addNotification, removeNotification } = useWidgetNotifications();
-  const { inAmount, tokenIn, tokenOut, quote, tokens } =
-    useTransactionContext();
+  const {
+    inAmount,
+    tokenIn,
+    tokenOut,
+    quote,
+    tokens,
+    slippageTolerance,
+    isSupportedNetwork,
+  } = useTransactionContext();
   const [localInAmount, setLocalInAmount] = useState<string>(
     inAmount.toString()
   );
-  const [localTokenIn, setLocalTokenIn] = useState<any>(tokenIn);
-  const [localTokenOut, setLocalTokenOut] = useState<any>(tokenOut);
-  const [inTokens, setInTokens] = useState<any>([]);
-  const { updateInAmount } = useTransactionCtxActions();
-  const { account: metaAddress, active } = useLayer2();
+  const [localTokenIn, setLocalTokenIn] = useState<any>();
+  const [localTokenOut, setLocalTokenOut] = useState<any>();
+  const [inTokens, setInTokens] = useState<Token[]>([]);
+  const [outTokens, setOutTokens] = useState<Token[]>([]);
+  const { updateInAmount, updateTokenIn, updateTokenOut } =
+    useTransactionCtxActions();
+  const { account, account: metaAddress, active, chainId } = useLayer2();
   const isActive = metaAddress && active;
-  useWalletSupportRedirect(60); //TODO: check this
+  useWalletSupportRedirect();
   const { connect, connectionPending } = useConnectWallet();
 
-  const ethBalance = useEtherBalance(account);
-  const tokenOutBalance = useTokenBalance(tokenOut.address, account);
+  const ethBalance = useEtherBalance(account) ?? 0;
+  let tokenInBalance = useTokenBalance(localTokenIn?.address, account) ?? 0;
+  if (localTokenIn?.symbol === "ETH") tokenInBalance = ethBalance;
+  let tokenOutBalance = useTokenBalance(localTokenOut?.address, account) ?? 0;
+  if (localTokenOut?.symbol === "ETH") tokenOutBalance = ethBalance;
 
   const { backScreen, nextScreen } = useNav();
   const { updateQuote, loading: quoteLoading } = useUpdateQuote();
@@ -77,28 +83,40 @@ const DirectSwapView: React.FC<DirectSwapViewProps> = (props) => {
   const { executeTransaction, loading: transactionLoading } =
     useExecuteTransaction();
   const beforeUnLoadRef = useRef<AbortController>(new AbortController());
-  const heading = `Swap ${tokenIn.symbol} for ${tokenOut.symbol}`;
+  const heading =
+    localTokenIn?.symbol && localTokenOut?.symbol
+      ? `Swap ${localTokenIn?.symbol} for ${localTokenOut?.symbol}`
+      : `Swap`;
   const [notificationId, setNotificationId] = useState<string | undefined>();
   const debouncedUpdateQuote = useDebouncedCallback(updateQuote, 600);
-
-  const insufficientFunds =
-    ethBalance !== undefined &&
-    Number(utils.formatEther(ethBalance)) < Number(localInAmount);
-
-  const chainIn = 3;
+  const [isInsufficientFunds, setIsInsufficientFunds] = useState(false);
 
   useEffect(() => {
-    getTokens([chainIn]);
-  }, [getTokens]);
+    account &&
+      localTokenIn &&
+      setIsInsufficientFunds(
+        Number(formatTokenAmount(localTokenIn, tokenInBalance)) <
+          Number(localInAmount)
+      );
+  }, [tokenInBalance, localInAmount, localTokenIn, account]);
 
   useEffect(() => {
-    setLocalTokenIn(tokens[chainIn]?.[0]);
-    setLocalTokenOut(tokens[chainIn]?.[2]);
-    setInTokens(tokens[chainIn]);
-  }, [tokens]);
+    getTokens([chainId ?? defaultChainId]);
+  }, [getTokens, chainId]);
 
   useEffect(() => {
-    if (Number(localInAmount) > 0 && !insufficientFunds) {
+    if (!tokensLoading) {
+      setLocalTokenIn(tokens[chainId ?? defaultChainId]?.[0]);
+      setInTokens(tokens[chainId ?? defaultChainId]);
+      setOutTokens(tokens[chainId ?? defaultChainId]);
+    }
+  }, [tokens, chainId, tokensLoading]);
+
+  useEffect(() => {
+    if (Number(localInAmount) > 0) {
+      updateInAmount(Number(localInAmount));
+      updateTokenIn(localTokenIn);
+      updateTokenOut(localTokenOut);
       debouncedUpdateQuote(
         Number(localInAmount),
         localTokenIn,
@@ -109,59 +127,41 @@ const DirectSwapView: React.FC<DirectSwapViewProps> = (props) => {
   }, [
     debouncedUpdateQuote,
     getTokens,
-    insufficientFunds,
+    isInsufficientFunds,
     localInAmount,
     localTokenIn,
     localTokenOut,
+    updateInAmount,
+    updateTokenIn,
+    updateTokenOut,
+    slippageTolerance,
+    isSupportedNetwork,
   ]);
 
   const onMaxClick = useCallback(async () => {
-    if (ethBalance) {
-      setLocalInAmount(utils.formatEther(ethBalance));
+    if (tokenInBalance) {
+      setLocalInAmount(formatTokenAmount(localTokenIn, tokenInBalance));
     }
-  }, [ethBalance]);
+  }, [localTokenIn, tokenInBalance]);
 
   const onBackClick = () => {
     onBeforeUnload();
     updateQuote(inAmount);
   };
 
-  console.log(!tokensLoading && tokens);
-
-  const handleContinue = () => {
-    updateInAmount(Number(localInAmount));
-    backScreen();
-  };
-
-  // useEffect(() => {
-  //   setBreakdown(
-  //     generateBreakdown(
-  //       localQuote,
-  //       cryptoReceived.symbol,
-  //       Number(slippageTolerance),
-  //       priceImpact
-  //     )
-  //   );
-  // }, [cryptoReceived.symbol, localQuote, priceImpact, slippageTolerance]);
-
   const handleErrorMessage = useCallback(() => {
     if (!notificationId) {
-      if (
-        ethBalance &&
-        Number(utils.formatEther(ethBalance)) < Number(localInAmount)
-      ) {
-        setSwapErrorMessage(insufficientFundsError);
-        const id = nanoid();
-        setNotificationId(id);
-        addNotification({
-          type: NotificationType.Warning,
-          message: insufficientFundsError,
-          shouldExpire: false,
-          id: id,
-        });
-      }
+      setSwapErrorMessage(insufficientFundsError);
+      const id = nanoid();
+      setNotificationId(id);
+      addNotification({
+        type: NotificationType.Warning,
+        message: insufficientFundsError,
+        shouldExpire: true,
+        id: id,
+      });
     }
-  }, [addNotification, ethBalance, localInAmount, notificationId]);
+  }, [addNotification, notificationId]);
 
   const handleRemoveErrorMessage = useCallback(() => {
     if (notificationId) {
@@ -171,16 +171,22 @@ const DirectSwapView: React.FC<DirectSwapViewProps> = (props) => {
   }, [notificationId, removeNotification]);
 
   useEffect(() => {
-    if (insufficientFunds) {
+    if (isSupportedNetwork && isInsufficientFunds) {
       handleErrorMessage();
     } else {
       handleRemoveErrorMessage();
     }
-  }, [handleErrorMessage, handleRemoveErrorMessage, insufficientFunds]);
+  }, [
+    handleErrorMessage,
+    handleRemoveErrorMessage,
+    isInsufficientFunds,
+    isSupportedNetwork,
+  ]);
 
-  const formattedOutputAmount = quote?.toAmountMin
-    ? formatTokenAmount(tokenOut, quote?.toAmountMin)
-    : "0.000";
+  const formattedOutputAmount =
+    tokenOut && quote?.toAmountMin
+      ? formatTokenAmount(tokenOut, quote?.toAmountMin)
+      : "0.000";
 
   const onBeforeUnload = () => {
     beforeUnLoadRef.current.abort();
@@ -196,7 +202,9 @@ const DirectSwapView: React.FC<DirectSwapViewProps> = (props) => {
 
   const handleItemClick = useCallback(
     (name: string, index: number, item: ItemType) => {
-      setLocalTokenIn(item);
+      console.log(item);
+      if (name === "inTokens") setLocalTokenIn(item);
+      else setLocalTokenOut(item);
       backScreen();
     },
     [backScreen]
@@ -208,56 +216,80 @@ const DirectSwapView: React.FC<DirectSwapViewProps> = (props) => {
         <OverlayPicker
           name="inTokens"
           title={"Select a token"}
-          // indexSelected={data.availableCurrencies.findIndex(
-          //   (m) => m.id === collected.selectedCurrency?.id
-          // )}
-          items={inTokens as any}
+          indexSelected={inTokens.findIndex(
+            (t: Token) => t.name === tokenIn?.name
+          )}
+          items={inTokens.map((t) => {
+            return {
+              ...t,
+              id: t.name,
+              name: t.name,
+              icon: t.logoURI,
+              info: t.symbol,
+            };
+          })}
           onItemClick={handleItemClick}
           searchable
         />
       );
     }
-  }, [inTokens, handleItemClick, nextScreen]);
+  }, [inTokens, nextScreen, handleItemClick, tokenIn?.name]);
 
   const openOutTokens = useCallback(() => {
-    if (inTokens.length > 1) {
+    if (outTokens.length > 1) {
       nextScreen(
         <OverlayPicker
           name="outTokens"
           title={"Select a token"}
-          // indexSelected={data.availableCurrencies.findIndex(
-          //   (m) => m.id === collected.selectedCurrency?.id
-          // )}
-          items={inTokens as any}
+          indexSelected={outTokens.findIndex(
+            (t: Token) => t.name === tokenOut?.name
+          )}
+          items={outTokens.map((t) => {
+            return {
+              ...t,
+              id: t.name,
+              name: t.name,
+              icon: t.logoURI,
+              info: t.symbol,
+            };
+          })}
           onItemClick={handleItemClick}
           searchable
         />
       );
     }
-  }, [inTokens, handleItemClick, nextScreen]);
+  }, [outTokens, nextScreen, handleItemClick, tokenOut?.name]);
 
   const handleDropdown = useCallback(
-    (item?: any) => {
-      openInTokens();
-      console.log(item);
+    (item?: any, type?: "in" | "out") => {
+      if (type === "in") {
+        openInTokens();
+      } else {
+        openOutTokens();
+      }
     },
-    [openInTokens]
+    [openInTokens, openOutTokens]
   );
 
+  const isDisabled = () => {
+    return (
+      !isActive ||
+      !inAmount ||
+      transactionLoading ||
+      quoteLoading ||
+      isInsufficientFunds ||
+      !isSupportedNetwork
+    );
+  };
   return (
     <div className={commonClasses.view}>
-      <ProgressHeader
-        onBackClick={onBackClick}
-        percentage={props.progress}
-        useBackButton
-      />
+      <ProgressHeader onBackClick={onBackClick} percentage={props.progress} />
       <main className={`${commonClasses.body} ${classes["wrapper"]}`}>
         <div className={classes["top-section"]}>
           <Heading className={classes.heading} text={heading} />
           <TransactionSettings className={classes["settings"]} />
         </div>
         <WidgetNotification />
-        {/* <ErrorIndication message={swapErrorMessage} /> */}
 
         <InputDropdown
           label={"You spend"}
@@ -269,18 +301,23 @@ const DirectSwapView: React.FC<DirectSwapViewProps> = (props) => {
           }
           className={inputClasses["swap-screen"]}
           hint={`Balance: ${
-            ethBalance ? utils.formatEther(ethBalance).slice(0, 5) : "0.00"
+            tokenInBalance
+              ? trimLargeNumber(
+                  formatTokenAmount(localTokenIn, tokenInBalance),
+                  4
+                )
+              : "0.00"
           }`}
           onMaxClick={onMaxClick}
           suffix={`($${quote?.fromAmountUSD ?? "0.00"})`}
           handleProps={{
             icon: localTokenIn?.logoURI,
-            value: localTokenIn?.symbol,
+            value: localTokenIn ? localTokenIn.symbol : "Select a token",
             disabled: false,
-            onClick: () => handleDropdown(localTokenIn),
+            onClick: () => handleDropdown(localTokenIn, "in"),
           }}
           markedError={!!swapErrorMessage}
-          useEditIcon={true}
+          readonly={!localTokenOut}
         />
 
         <InputDropdown
@@ -289,15 +326,18 @@ const DirectSwapView: React.FC<DirectSwapViewProps> = (props) => {
           className={inputClasses["swap-screen"]}
           hint={`Balance: ${
             tokenOutBalance
-              ? trimLargeNumber(formatTokenAmount(tokenOut, tokenOutBalance), 6)
+              ? trimLargeNumber(
+                  formatTokenAmount(localTokenOut, tokenOutBalance),
+                  4
+                )
               : "0.00"
           }`}
           suffix={`($${quote?.toAmountUSD ?? "0.00"})`}
           handleProps={{
             icon: localTokenOut?.logoURI,
-            value: localTokenOut?.symbol,
+            value: localTokenOut ? localTokenOut.symbol : "Select a token",
             disabled: false,
-            onClick: () => handleDropdown(localTokenOut),
+            onClick: () => handleDropdown(localTokenOut, "out"),
           }}
           readonly
         />
@@ -321,10 +361,14 @@ const DirectSwapView: React.FC<DirectSwapViewProps> = (props) => {
             {isActive ? (
               <>
                 <ButtonAction
-                  disabled={!isActive || transactionLoading || quoteLoading}
+                  disabled={isDisabled()}
                   className={classes.buttonInGroup}
-                  text={"Confirm Swap"}
-                  // onClick={executeTransaction}
+                  text={
+                    isInsufficientFunds
+                      ? `Insufficient ${tokenIn.symbol} balance`
+                      : "Swap Now"
+                  }
+                  onClick={executeTransaction}
                   pending={transactionLoading || quoteLoading}
                 />
               </>
@@ -343,48 +387,5 @@ const DirectSwapView: React.FC<DirectSwapViewProps> = (props) => {
     </div>
   );
 };
-
-// const ErrorIndication: React.FC<{ message?: string }> = (props) => {
-//   const [message, setMessage] = useState(props.message || "");
-//   const ref = useRef<HTMLDivElement>(null);
-
-//   useEffect(() => {
-//     if (props.message) {
-//       setMessage(props.message);
-//     }
-//   }, [props.message]);
-
-//   return (
-//     <CSSTransition
-//       nodeRef={ref}
-//       in={!!props.message}
-//       timeout={200}
-//       classNames={{
-//         enter: commonClasses["collapse-enter"],
-//         enterActive: commonClasses["collapse-enter-active"],
-//         exit: commonClasses["collapse-exit"],
-//         exitActive: commonClasses["collapse-exit-active"],
-//       }}
-//       mountOnEnter
-//       unmountOnExit
-//     >
-//       <div className={classes["error-section"]} ref={ref}>
-//         <IndicationItem error text={message} />
-//       </div>
-//     </CSSTransition>
-//   );
-// };
-// const IndicationItem: React.FC<{ error?: boolean; text: string }> = (props) => {
-//   return (
-//     <div
-//       className={`${classes["info-wrapper"]} ${
-//         props.error ? classes["indication-error"] : ""
-//       }`}
-//     >
-//       <HexExclamationIcon className={classes["exclamation-icon"]} />
-//       <div className={classes["info-txt"]}>{props.text}</div>
-//     </div>
-//   );
-// };
 
 export default DirectSwapView;

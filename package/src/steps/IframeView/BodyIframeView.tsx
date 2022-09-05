@@ -21,7 +21,7 @@ import { ButtonAction } from "../../common/Buttons";
 import ChooseGatewayView from "../../ChooseGatewayView/ChooseGatewayView";
 import Footer from "../../common/Footer";
 import { PaymentProgressView } from "../PaymentProgressView";
-import { getNativeToken, isL2Gateway, knownDexes } from "../../utils";
+import { getNativeToken, isL2Gateway } from "../../utils";
 import {
   isIframeStep,
   isRedirectStep,

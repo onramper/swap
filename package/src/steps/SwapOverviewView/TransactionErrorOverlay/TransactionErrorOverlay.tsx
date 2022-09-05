@@ -50,7 +50,6 @@ const TransactionErrorOverlay: React.FC<TransactionErrorOverlayProps> = (
         className={`${commonClasses.view} ${classes["view"]}`}
       >
         <nav>
-          <div> Failed </div>
           <CloseIcon className={classes["close-icon"]} onClick={onDismiss} />
         </nav>
 

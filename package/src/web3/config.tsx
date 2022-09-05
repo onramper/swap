@@ -1,4 +1,11 @@
-import { Config, useEthers, DAppProvider } from "@usedapp/core";
+import {
+  Config,
+  useEthers,
+  DAppProvider,
+  Ropsten,
+  Rinkeby,
+  Mainnet,
+} from "@usedapp/core";
 import React, { createContext, ReactNode, useContext } from "react";
 import { useConnectEnsName, useEnsAvatar } from "./hooks/ens";
 
@@ -9,10 +16,9 @@ const infuraProjectId = "bb5c9b186fcf4139865a530801c160f9";
 export const config: Config = {
   autoConnect: false,
   readOnlyUrls: {
-    // 1: `https://mainnet.infura.io/v3/${infuraProjectId}`,
-    3: `https://ropsten.infura.io/v3/${infuraProjectId}`, // Moonpay sell Ropsten eth for sandbox env
-    // [4]: `https://rinkeby.infura.io/v3/${infuraProjectId}`,
-    // [5]: `https://goerli.infura.io/v3/${infuraProjectId}`,
+    [Mainnet.chainId]: `https://mainnet.infura.io/v3/${infuraProjectId}`,
+    [Ropsten.chainId]: `https://ropsten.infura.io/v3/${infuraProjectId}`,
+    [Rinkeby.chainId]: `https://rinkeby.infura.io/v3/${infuraProjectId}`,
   },
   notifications: {
     expirationPeriod: 30000,

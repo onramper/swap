@@ -48,10 +48,13 @@ const TransactionSettings: React.FC<TransactionSettingsProps> = (props) => {
 
   const [slippageValue, setSlippageValue] = useState(ctxSlippage.toFixed(2));
 
-  const [deadlineValue, setDeadlineValue] = useState(
+  const [deadlineValue] = useState(
     String(Math.floor((ctxDeadline / 60) * 100) / 100)
   );
-  const [initialDeadlineValue] = useState(deadlineValue);
+  // const [deadlineValue, setDeadlineValue] = useState(
+  //   String(Math.floor((ctxDeadline / 60) * 100) / 100)
+  // );
+  // const [initialDeadlineValue] = useState(deadlineValue);
 
   const computeSlippageAutoBtnClass = useCallback(() => {
     const outlineClass =
@@ -103,17 +106,17 @@ const TransactionSettings: React.FC<TransactionSettingsProps> = (props) => {
     setSlippageValue(Number(slippageValue).toFixed(2));
   }, [getErrorTextSlippage, resetSlippage, slippageValue]);
 
-  const deadlineHasError = useCallback(() => {
-    return !Number(deadlineValue) || Number(deadlineValue) < 0;
-  }, [deadlineValue]);
+  // const deadlineHasError = useCallback(() => {
+  //   return !Number(deadlineValue) || Number(deadlineValue) < 0;
+  // }, [deadlineValue]);
 
-  const onBlurDeadline = useCallback(() => {
-    if (deadlineHasError()) {
-      setDeadlineValue(initialDeadlineValue);
-      return;
-    }
-    setDeadlineValue(Number(deadlineValue).toFixed(2));
-  }, [deadlineHasError, deadlineValue, initialDeadlineValue]);
+  // const onBlurDeadline = useCallback(() => {
+  //   if (deadlineHasError()) {
+  //     setDeadlineValue(initialDeadlineValue);
+  //     return;
+  //   }
+  //   setDeadlineValue(Number(deadlineValue).toFixed(2));
+  // }, [deadlineHasError, deadlineValue, initialDeadlineValue]);
 
   const goToWalletDestination = useCallback(() => {
     nextScreen(<DestinationWalletView />);

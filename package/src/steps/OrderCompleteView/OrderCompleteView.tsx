@@ -1,23 +1,24 @@
-import React, { useContext, useEffect, useState } from "react";
-import classes from "./OrderCompleteView.module.css";
-import commonClasses from "./../../styles.module.css";
-import ProgressHeader from "../../common/Header/ProgressHeader/ProgressHeader";
 import Lottie from "lottie-react";
-import successAnimation from "../../icons/animations/success.json";
+import React, { useEffect, useState } from "react";
 import { ButtonSecondary } from "../../common/Buttons";
-import { APIContext } from "../../ApiContext";
+import ProgressHeader from "../../common/Header/ProgressHeader/ProgressHeader";
+import successAnimation from "../../icons/animations/success.json";
+import commonClasses from "./../../styles.module.css";
+import classes from "./OrderCompleteView.module.css";
+// import { APIContext } from "../../ApiContext";
 import { useNav } from "../../NavContext";
-import BuyCryptoView from "../../BuyCryptoView";
+// import BuyCryptoView from "../../BuyCryptoView";
 import { TokenInfo } from "layer2";
 import { useNavigate } from "react-router-dom";
 import { useAddTokenToMetamask } from "../../web3/hooks/useAddTokenToMetamask";
+import DirectSwapView from "../SwapOverviewView/DirectSwapView/DirectSwapView";
 
 const OrderCompleteView: React.FC<{
   description: string;
   title: string;
   tokenOut: TokenInfo;
 }> = (props) => {
-  const { collected } = useContext(APIContext);
+  // const { collected } = useContext(APIContext);
   const { onlyScreen } = useNav();
   const [autoPlay, setAutoPlay] = useState(false);
   const { addToken } = useAddTokenToMetamask(props.tokenOut);
@@ -32,9 +33,7 @@ const OrderCompleteView: React.FC<{
 
   const exitHandler = () => {
     navigate("/", { replace: true });
-    collected.redirectURL
-      ? window.open(collected.redirectURL, "_parent")
-      : onlyScreen(<BuyCryptoView />);
+    onlyScreen(<DirectSwapView />);
   };
 
   return (

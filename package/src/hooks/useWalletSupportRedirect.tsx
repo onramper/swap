@@ -11,13 +11,13 @@ export enum SupportLevels {
 }
 
 export const useWalletSupportRedirect = (
-  currentProgress: number | undefined
+  currentProgress?: number | undefined
 ) => {
   const { nextScreen, replaceScreen } = useNav();
 
   const checkWalletSupport = useCallback(() => {
     try {
-      if(!browserSupportsMetamask()) {
+      if (!browserSupportsMetamask()) {
         replaceScreen(
           <BrowserNotSupported currentProgress={currentProgress} />
         );
@@ -38,9 +38,7 @@ export const useWalletSupportRedirect = (
         return;
       }
 
-      replaceScreen(
-        <BrowserNotSupported currentProgress={currentProgress} />
-      );
+      replaceScreen(<BrowserNotSupported currentProgress={currentProgress} />);
     } catch (error) {
       replaceScreen(<BrowserNotSupported currentProgress={currentProgress} />);
     }

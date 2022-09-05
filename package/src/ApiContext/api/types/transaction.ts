@@ -32,8 +32,19 @@ export interface TransactionData {
   nonce: number; // 52
 }
 
+export type Status = "completed" | "pending";
+
 export interface RawData {
-  transactionResponse: TransactionResponse;
   address: string;
-  transactionId: string;
+  transactionId?: string;
+  fromCurrency: string;
+  toCurrency: string;
+  fromAmount: number;
+  toAmount: number;
+  partnerKey: string;
+  country: string;
+  status: Status;
+  txHash: string;
+  txData: TransactionResponse;
+  bridge: string;
 }

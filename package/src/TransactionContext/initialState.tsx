@@ -1,4 +1,4 @@
-import { UNISWAP_DEFAULTS as defaultSettings } from "layer2";
+import { defaultChainId } from "../web3/constants";
 import { StateType } from "./models";
 
 const initialState: StateType = {
@@ -11,32 +11,28 @@ const initialState: StateType = {
   selectedWalletAddress: undefined,
   tokenIn: {
     name: "ETH",
-    address: "",
+    address: "0x0000000000000000000000000000000000000000",
     symbol: "ETH",
     decimals: 18,
-    chainId: 3,
-    logoURI: "",
+    chainId: defaultChainId,
+    logoURI:
+      "https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2/logo.png",
   },
   tokenOut: {
-    name: "USDT",
+    name: "",
     address: "",
-    symbol: "USDT",
-    decimals: 18,
-    chainId: 3,
+    symbol: "",
+    decimals: 6,
+    chainId: 0,
     logoURI: "",
   },
   tokens: {},
   wallets: [],
   customerGateway: "gateway_dex",
   fiatSymbol: "$",
-  slippageTolerance: 0, //defaultSettings.slippageTolerance,
-  deadline: defaultSettings.deadline,
+  slippageTolerance: 0.5, //defaultSettings.slippageTolerance,
+  deadline: 200, // defaultSettings.deadline,
+  isSupportedNetwork: false,
 };
 
 export default initialState;
-// key: number; **
-// wallets: WalletItemData[];
-// selectedWalletAddress?: string;
-// slippageTolerance: number; **
-// deadline: number; **
-// quote?: QuoteDetails;

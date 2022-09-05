@@ -73,7 +73,9 @@ const InputDropdown: React.FC<InputDropdownProps> = (
     <div
       className={`${styles["wrapper"]} ${
         props.error ? styles["has-error"] : ""
-      } ${props.markedError ? styles["has-marked-error"] : ""} ${props.className || ""}`}
+      } ${props.markedError ? styles["has-marked-error"] : ""} ${
+        props.className || ""
+      }`}
       ref={wrapperRef}
     >
       <div className={styles["content-wrapper"]}>

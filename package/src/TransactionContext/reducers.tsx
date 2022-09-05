@@ -18,6 +18,7 @@ export enum ActionTypes {
   UpdateTokenOut = "UpdateTokenOut",
   UpdateFiatSymbol = "UpdateFiatSymbol",
   UpdateInAmount = "UpdateInAmount",
+  SetIsSupportedNetwork = "SetIsSupportedNetwork",
 }
 
 export type DataActions =
@@ -71,6 +72,10 @@ export type DataActions =
   | {
       type: ActionTypes.UpdateDeadline | ActionTypes.UpdateSlippageTolerance;
       payload: number;
+    }
+  | {
+      type: ActionTypes.SetIsSupportedNetwork;
+      payload: boolean;
     };
 
 export default (state: StateType, action: DataActions): StateType => {
@@ -143,6 +148,12 @@ export default (state: StateType, action: DataActions): StateType => {
       return {
         ...state,
         slippageTolerance: action.payload,
+      };
+
+    case ActionTypes.SetIsSupportedNetwork:
+      return {
+        ...state,
+        isSupportedNetwork: action.payload,
       };
 
     default:

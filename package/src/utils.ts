@@ -24,7 +24,7 @@ export const lifiNativeTokens = async (): Promise<TokenInfo[]> => {
 // for now we just do ethereum,
 export const getNativeToken = async (chainId: number): Promise<TokenInfo> => {
   const chainTokens = await lifiNativeTokens();
-
+  console.log(chainTokens);
   if (chainTokens) {
     const nativeToken = chainTokens.find((chain) => chain.chainId === chainId);
     if (nativeToken) {

@@ -97,6 +97,16 @@ export const useTransactionCtxActions = () => {
     [dispatch]
   );
 
+  const setIsSupportedNetwork = useCallback(
+    (isSupported: boolean) => {
+      dispatch({
+        type: ActionTypes.SetIsSupportedNetwork,
+        payload: isSupported,
+      });
+    },
+    [dispatch]
+  );
+
   const initialiseTransactionContext = useCallback(
     (payload: {
       customerGateway: string;
@@ -126,5 +136,6 @@ export const useTransactionCtxActions = () => {
     updateInAmount,
     setTransactionRequest,
     setTokens,
+    setIsSupportedNetwork,
   };
 };

@@ -1,7 +1,7 @@
 import React from "react";
 import ReactDOM from "react-dom";
 import styles from "./styles.module.css";
-import BuyCryptoView from "./BuyCryptoView";
+// import BuyCryptoView from "./BuyCryptoView";
 import ErrorView from "./common/ErrorView";
 import { NavProvider, NavContainer } from "./NavContext";
 import { APIProvider } from "./ApiContext";
@@ -17,8 +17,8 @@ import { NotificationProvider } from "./NotificationContext";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { PaymentProgressView } from "./steps/PaymentProgressView";
 import { L2Provider } from "./web3/config";
-import { GTM_ID } from "./ApiContext/api/constants";
-import { GTMProvider } from "./hooks/gtm";
+// import { GTM_ID } from "./ApiContext/api/constants";
+// import { GTMProvider } from "./hooks/gtm";
 import DirectSwapView from "./steps/SwapOverviewView/DirectSwapView/DirectSwapView";
 
 type OnramperSwapProps = Omit<APIProviderType, "themeColor"> & {
@@ -42,10 +42,10 @@ const OnramperSwap: React.FC<OnramperSwapProps> = (props) => {
     "--font-family": fontFamily,
   } as React.CSSProperties;
 
-  const gtmParams = {
-    gtmId: GTM_ID,
-    dataLayer: { apiKey: props.API_KEY },
-  };
+  // const gtmParams = {
+  //   gtmId: GTM_ID,
+  //   dataLayer: { apiKey: props.API_KEY },
+  // };
 
   return (
     <BrowserRouter>
@@ -68,7 +68,7 @@ const OnramperSwap: React.FC<OnramperSwapProps> = (props) => {
         >
           {/* <GTMProvider state={gtmParams}> */}
           <NavProvider>
-            <APIProvider
+            <APIProvider //TODO: clean api context
               API_KEY={props.API_KEY}
               defaultAmount={props.defaultAmount}
               defaultAddrs={props.defaultAddrs}
@@ -112,28 +112,6 @@ const OnramperSwap: React.FC<OnramperSwapProps> = (props) => {
                           </div>
                         }
                       />
-                      {/* <Route
-                    path="/:txId"
-                    element={
-                      <L2Provider>
-                        <TransactionContextProvider>
-                          <NotificationProvider>
-                            <div style={{ flexGrow: 1, display: "flex" }}>
-                              <NavContainer home={<PaymentProgressView />} />
-                            </div>
-                          </NotificationProvider>
-                        </TransactionContextProvider>
-                      </L2Provider>
-                    }
-                  /> */}
-                      {/* <Route
-                    path="/*"
-                    element={
-                      <div style={{ flexGrow: 1, display: "flex" }}>
-                        <NavContainer home={<BuyCryptoView />} />
-                      </div>
-                    }
-                  /> */}
                     </Routes>
                   </NotificationProvider>
                 </TransactionContextProvider>

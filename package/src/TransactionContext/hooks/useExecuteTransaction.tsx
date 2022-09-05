@@ -1,13 +1,7 @@
-import {
-  TransactionStatus,
-  useEtherBalance,
-  useSendTransaction,
-} from "@usedapp/core";
-import { formatEther } from "ethers/lib/utils";
+import { useSendTransaction } from "@usedapp/core";
 import { lifiChains } from "layer2";
 import { nanoid } from "nanoid";
 import React, { useCallback, useEffect, useRef, useState } from "react";
-import { storeTransactionData } from "../../ApiContext/api";
 import { useNav } from "../../NavContext";
 import {
   NotificationType,
@@ -18,7 +12,6 @@ import TransactionErrorOverlay from "../../steps/SwapOverviewView/TransactionErr
 import { useLayer2 } from "../../web3/config";
 import { getLifiQuote } from "../../web3/lifi";
 import { useTransactionContext } from "./useTransactionContext";
-// import TransactionErrorOverlay from "./TransactionErrorOverlay";
 
 export const useExecuteTransaction = () => {
   const { account, chainId } = useLayer2();
@@ -32,14 +25,13 @@ export const useExecuteTransaction = () => {
     slippageTolerance,
   } = useTransactionContext();
   const { addNotification, removeNotification } = useWidgetNotifications();
-  const balance = useEtherBalance(account);
+  // const balance = useEtherBalance(account);
   const [loading, setLoading] = useState<boolean>(false);
   const { sendTransaction, state } = useSendTransaction();
   const { nextScreen } = useNav();
   const beforeUnLoadRef = useRef<AbortController>(new AbortController());
 
   const executeTransaction = useCallback(async () => {
-    debugger;
     const destinationAddress = selectedWalletAddress ?? account;
     if (!account) {
       addNotification({
@@ -68,16 +60,7 @@ export const useExecuteTransaction = () => {
       });
       return;
     }
-    const formattedBalance = balance && Number(formatEther(balance));
 
-    if (formattedBalance !== undefined && formattedBalance < inAmount) {
-      addNotification({
-        type: NotificationType.Warning,
-        message: "You have Insufficient funds to perform this transaction.",
-        shouldExpire: true,
-      });
-      return;
-    }
     try {
       if (transactionRequest) {
         setLoading(true);
@@ -93,6 +76,8 @@ export const useExecuteTransaction = () => {
           from: selectedWalletAddress ?? account,
           to: transactionRequest.to,
           value: transactionRequest.value,
+          // gasLimit: transactionRequest.gasLimit,
+          gasPrice: transactionRequest.gasPrice,
         });
         removeNotification(id);
       } else {
@@ -112,6 +97,7 @@ export const useExecuteTransaction = () => {
           beforeUnLoadRef.current.signal,
           slippageTolerance
         );
+
         if (res?.transactionRequest) {
           addNotification({
             type: NotificationType.Info,
@@ -123,6 +109,8 @@ export const useExecuteTransaction = () => {
             from: selectedWalletAddress ?? account,
             to: res.transactionRequest.to,
             value: res.transactionRequest.value,
+            gasLimit: res.transactionRequest.gasLimit,
+            gasPrice: res.transactionRequest.gasPrice,
           });
           if (receipt && receipt.blockHash) {
             addNotification({
@@ -152,7 +140,6 @@ export const useExecuteTransaction = () => {
   }, [
     account,
     addNotification,
-    balance,
     chainId,
     inAmount,
     removeNotification,
@@ -166,7 +153,8 @@ export const useExecuteTransaction = () => {
 
   const handleException = useCallback(
     (status, errorMessage) => {
-      if (status === "Exception") {
+      if (errorMessage) {
+        //status === "Exception"
         if (errorMessage?.includes("INSUFFICIENT_OUTPUT_AMOUNT")) {
           nextScreen(
             <TransactionErrorOverlay
@@ -205,8 +193,20 @@ export const useExecuteTransaction = () => {
               description="You rejected this transaction."
             />
           );
+        } else if (errorMessage?.includes("Insufficient allowance")) {
+          nextScreen(
+            <TransactionErrorOverlay
+              textAlert="Insufficient allowance"
+              description="Cannot estimate gas; transaction may fail or may require manual gas limit."
+            />
+          );
         } else {
-          alert(errorMessage);
+          nextScreen(
+            <TransactionErrorOverlay
+              textAlert=""
+              description="Unable to process transaction."
+            />
+          );
         }
       }
     },
@@ -215,12 +215,21 @@ export const useExecuteTransaction = () => {
 
   const handleMining = useCallback(async () => {
     if (state.transaction && account) {
+      console.log(state.transaction);
       try {
-        storeTransactionData({
-          transactionResponse: state.transaction,
-          address: account,
-          transactionId: txId,
-        });
+        // storeTransactionData({
+        //   address: account,
+        //   fromAmount: inAmount,
+        //   toAmount: 0,
+        //   txHash: state.transaction.hash,
+        //   fromCurrency: tokenIn.symbol,
+        //   toCurrency: tokenOut.symbol,
+        //   status: "pending",
+        //   bridge: "",
+        //   country: "",
+        //   partnerKey: "",
+        //   txData: state.transaction,
+        // });
       } catch (error) {
         console.log(error);
       }
@@ -232,7 +241,7 @@ export const useExecuteTransaction = () => {
         tokenOut={tokenOut}
       />
     );
-  }, [account, nextScreen, state, tokenOut, txId]);
+  }, [account, nextScreen, state.transaction, tokenOut]);
 
   useEffect(() => {
     if (state.status === "Mining") {

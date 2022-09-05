@@ -8,10 +8,7 @@ import { utils } from "ethers";
 
 // if ?prod=true
 const isProd = (): boolean => {
-  const url = new URL(window.location.href);
-  const prodValue = url.searchParams.get("prod");
-  if (prodValue) return true;
-  return false;
+  return process.env.STAGE === "prod";
 };
 
 const lifiUrl = isProd()
@@ -21,6 +18,20 @@ const lifiUrl = isProd()
 const lifiConfig: ConfigUpdate = {
   apiUrl: lifiUrl,
 };
+
+export const supportedChains = [
+  { name: "Mainnet", coin: "ETH", id: 1 },
+  {
+    name: "Ropsten",
+    coin: "ETH",
+    id: 3,
+  },
+  {
+    name: "Rinkeby",
+    coin: "ETH",
+    id: 4,
+  },
+];
 
 export const lifi = new LIFI(lifiConfig);
 
@@ -34,7 +45,7 @@ export const getLifiQuote = async (
   slippage: number = 0.05
 ) => {
   const formattedAmount = utils
-    .parseUnits(inputAmount.toString(), tokenIn.decimals)
+    .parseUnits(inputAmount.toString(), tokenIn?.decimals)
     .toString();
   const request: QuoteRequest = {
     fromChain: tokenIn.chainId,

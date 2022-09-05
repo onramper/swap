@@ -8,7 +8,6 @@ import classes from "./ListItemButtonGroup.module.css";
 import AccountDetails from "../../steps/SwapOverviewView/AccountDetails/AccountDetails";
 
 const ListItemButtonGroup: React.FC<ListItemButtonGroupProps> = (props) => {
-  console.log(props.items);
   const onClick = (item: ListItemType) => {
     props.onClick?.(item);
     if (item.link) {

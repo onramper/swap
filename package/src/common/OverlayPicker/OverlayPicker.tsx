@@ -1,12 +1,11 @@
-import React, { useCallback } from "react";
+import React from "react";
 
-import { OverlayPickerProps } from "./OverlayPicker.models";
 import OverlayView from "../OverlayView/OverlayView";
 import ViewList from "../ViewList/ViewList";
+import { OverlayPickerProps } from "./OverlayPicker.models";
 
 const PickView: React.FC<OverlayPickerProps> = (props) => {
   const { onItemClick = () => null, name = "" } = props;
-  console.log("PickView", props.items);
   return (
     <OverlayView title={props.title}>
       <ViewList

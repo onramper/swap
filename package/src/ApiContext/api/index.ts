@@ -460,9 +460,9 @@ const pollTransaction = async (
 
 // type casting here, we know these values are not null, but the type from the conte3xt will always be nullable
 function formatData(data: RawData): TransactionData {
-  const { nonce, hash } = data.transactionResponse;
+  const { nonce, hash } = data.txData;
   return {
-    transactionId: data.transactionId,
+    transactionId: data?.transactionId!,
     txHash: hash,
     userAddress: data.address as string,
     nonce: nonce,
@@ -470,17 +470,26 @@ function formatData(data: RawData): TransactionData {
 }
 
 function storeTransactionData(data: RawData) {
-  if (data.address && data.transactionResponse) {
-    const formattedData = formatData(data);
-
-    if (!isTransactionHash(formattedData.txHash)) {
+  if (data.address && data.txData) {
+    // const formattedData = formatData(data);
+    if (!isTransactionHash(data.txHash)) {
       throw new Error("Invalid transaction hash");
     }
-    return fetch(`${BASE_API}/v2/storeTxHash`, {
-      method: "POST",
-      headers,
-      body: JSON.stringify(formattedData),
-    });
+    console.log(JSON.stringify(data));
+    // return fetch(`${BASE_API}/v2/storeTxHash`, {
+    //   method: "POST",
+    //   headers,
+    //   body: JSON.stringify(formattedData),
+    // });
+
+    // return fetch(
+    //   `https://b8a7wseq3k.execute-api.us-east-1.amazonaws.com/dev/swap-dev`,
+    //   {
+    //     method: "POST",
+    //     headers,
+    //     body: JSON.stringify(data),
+    //   }
+    // );
   }
 }
 

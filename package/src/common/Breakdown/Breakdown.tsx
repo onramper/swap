@@ -32,7 +32,6 @@ const Breakdown = () => {
   }, []);
 
   const { inAmount, totalGas, minimumOutput, fees } = useFeeBreakdown();
-
   return (
     <div
       ref={wrapperRef}
@@ -80,7 +79,7 @@ const Breakdown = () => {
                     key={nanoid()}
                     label={fee.label}
                     amount={fee.amount}
-                    trimDecimals={0}
+                    trimDecimals={3}
                     symbol={"gwei"}
                   />
                 ))}
