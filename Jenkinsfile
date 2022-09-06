@@ -13,6 +13,12 @@ pipeline {
     agent any
 
     stages {
+        stage(Build) {
+            steps{
+                sh 'cd package && npm ci --omit peer &&  npm run build:dev'
+            }   
+        }
+
         stage('TF - Init') {  
             steps {
                 sh 'pwd; cd terraform; terraform init -input=false'       
