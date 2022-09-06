@@ -13,7 +13,7 @@ pipeline {
     agent any
 
     stages {
-        stage(Build) {
+        stage('Build') {
             steps{
                 sh 'cd package && npm ci --omit peer &&  npm run build:dev'
             }   
