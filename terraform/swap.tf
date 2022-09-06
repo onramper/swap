@@ -2,11 +2,11 @@ provider "aws" {
    region = "us-east-1"
 }
 
-resource "aws_s3_bucket" "swap_dev" {
-  bucket = "swap_dev"
+resource "aws_s3_bucket" "swap-dev" {
+  bucket = "swap-dev"
 }
 
-resource "aws_s3_bucket_public_access_block" "swap_dev_acl" {
+resource "aws_s3_bucket_public_access_block" "swap-dev-acl" {
   bucket = aws_s3_bucket.swap_dev.id
   block_public_acls       = true
   block_public_policy     = true
