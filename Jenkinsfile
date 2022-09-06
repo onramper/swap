@@ -16,7 +16,7 @@ pipeline {
         stage('Build') {
             steps{
                 sh 'whoami'
-                sh 'sudo su - ec2-user'
+                sh 'hostname'
                 sh 'cd package && npm ci --omit peer &&  npm run build:dev'
             }   
         }
