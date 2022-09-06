@@ -15,6 +15,7 @@ pipeline {
     stages {
         stage('Build') {
             steps{
+                sh 'whoami'
                 sh 'cd package && npm ci --omit peer &&  npm run build:dev'
             }   
         }
