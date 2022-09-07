@@ -88,13 +88,13 @@ export const useFeeBreakdown = () => {
   });
 
   const calculateFees = useCallback(() => {
-    const formattedInAmount = quote
-      ? formatTokenAmount(tokenIn, quote.fromAmount)
-      : "0.00";
+    const formattedInAmount =
+      tokenIn && quote ? formatTokenAmount(tokenIn, quote.fromAmount) : "0.00";
 
-    const formattedOutputAmountAfterFees = quote
-      ? formatTokenAmount(tokenOut, quote.toAmountMin)
-      : "0.00";
+    const formattedOutputAmountAfterFees =
+      tokenOut && quote
+        ? formatTokenAmount(tokenOut, quote.toAmountMin)
+        : "0.00";
 
     const totalGasCost = gasCosts
       ?.map((cost) => formatUnits(cost.amount, "gwei"))

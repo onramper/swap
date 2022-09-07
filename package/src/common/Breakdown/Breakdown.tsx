@@ -64,7 +64,7 @@ const Breakdown = () => {
                 label={inAmount.label}
                 amount={inAmount.amount}
                 trimDecimals={6}
-                symbol={tokenIn.symbol}
+                symbol={tokenIn?.symbol}
               />
               <FeeItem
                 label={totalGas.label}
@@ -95,7 +95,7 @@ const Breakdown = () => {
                 label={minimumOutput.label}
                 amount={minimumOutput.amount}
                 trimDecimals={6}
-                symbol={tokenOut.symbol}
+                symbol={tokenOut?.symbol}
               />
             </div>
           </div>

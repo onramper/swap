@@ -74,6 +74,12 @@ export function NotificationProvider({ children }: Props) {
     [dispatch]
   );
 
+  const removeAllNotifications = useCallback(() => {
+    dispatch({
+      type: "REMOVE_ALL_NOTIFICATIONS",
+    });
+  }, [dispatch]);
+
   useInterval(() => {
     const expiredNotification = getExpiredNotifications(
       notifications,
@@ -163,9 +169,9 @@ export function NotificationProvider({ children }: Props) {
       //     },
       //   });
       // } else {
-      if (tokenIn.chainId !== chainId) {
+      if (tokenIn?.chainId !== chainId) {
         const tokenChain = supportedChains.find(
-          (c) => c.id === tokenIn.chainId
+          (c) => c.id === tokenIn?.chainId
         );
         if (tokenChain) {
           // dispatch({
@@ -203,7 +209,12 @@ export function NotificationProvider({ children }: Props) {
 
   return (
     <NotificationContext.Provider
-      value={{ addNotification, notifications, removeNotification }}
+      value={{
+        addNotification,
+        notifications,
+        removeNotification,
+        removeAllNotifications,
+      }}
     >
       {children}
     </NotificationContext.Provider>
