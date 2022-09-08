@@ -7,7 +7,6 @@ import {
 } from "./types/gateways";
 import { FieldError } from "./types/nextStep";
 import { NextStep } from "..";
-import processMoonpayStep, { moonpayUrlRegex } from "@onramper/moonpay-adapter";
 import { BrowserClient, Hub } from "@sentry/browser";
 import type { CryptoAddrType } from "../initialState";
 import i18next from "i18next";
@@ -153,7 +152,7 @@ const executeStep = async (
   if (step.url === undefined)
     throw new Error("Unexpected error: Invalid step end.");
 
-  const isMoonpay = isMoonpayStep(step.url);
+  const isMoonpay = false; //isMoonpayStep(step.url);
   const isFile = step.type === "file";
   const isMoonpayFile = isFile && isMoonpay;
   const method = isMoonpayFile ? "PUT" : "POST";
@@ -165,26 +164,26 @@ const executeStep = async (
   const urlParams = createUrlParamsFromObject(params ?? {});
 
   logRequest(step.url);
-  const nextStepType = step.url.split("/")[5];
-  let nextStep: FetchResponse;
-  if (isMoonpay && nextStepType !== "redirect") {
-    nextStep = await processMoonpayStep(step.url, { method, headers, body });
-  } else {
-    nextStep = await fetch(`${step.url}?${urlParams}`, {
-      method,
-      headers,
-      body,
-    });
-  }
+  // const nextStepType = step.url.split("/")[5];
+  // let nextStep: FetchResponse;
+  // if (isMoonpay && nextStepType !== "redirect") {
+  // nextStep = await processMoonpayStep(step.url, { method, headers, body });
+  // } else {
+  const nextStep = await fetch(`${step.url}?${urlParams}`, {
+    method,
+    headers,
+    body,
+  });
+  // }
   return processResponse(nextStep);
 };
 
-const isMoonpayStep = (stepUrl: string) => {
-  if (process.env.STAGE === "demo")
-    //only for demo purposes
-    return false;
-  return moonpayUrlRegex.test(stepUrl);
-};
+// const isMoonpayStep = (stepUrl: string) => {
+//   if (process.env.STAGE === "demo")
+//     //only for demo purposes
+//     return false;
+//   return moonpayUrlRegex.test(stepUrl);
+// };
 
 /**
  * Utils
