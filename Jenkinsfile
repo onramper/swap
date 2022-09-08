@@ -15,9 +15,9 @@ pipeline {
     stages {
         stage('Build') {
             steps{
-                sh 'whoami'
-                sh 'hostname'
                 sh 'cd package && npm ci --omit peer &&  npm run build:dev'
+                sh 'cd iframe && npm ci && npm run build'
+                sh 'ls -al'
             }   
         }
 
