@@ -105,12 +105,12 @@ const DirectSwapView: React.FC<DirectSwapViewProps> = (props) => {
   }, [getTokens, chainId]);
 
   useEffect(() => {
-    if (!tokensLoading) {
+    if (tokens) {
       setLocalTokenIn(tokens[chainId ?? defaultChainId]?.[0]);
       setInTokens(tokens[chainId ?? defaultChainId]);
       setOutTokens(tokens[chainId ?? defaultChainId]);
     }
-  }, [tokens, chainId, tokensLoading]);
+  }, [tokens, chainId]);
 
   useEffect(() => {
     if (Number(localInAmount) > 0) {
@@ -365,7 +365,7 @@ const DirectSwapView: React.FC<DirectSwapViewProps> = (props) => {
                   className={classes.buttonInGroup}
                   text={
                     isInsufficientFunds
-                      ? `Insufficient ${tokenIn.symbol} balance`
+                      ? `Insufficient ${tokenIn?.symbol} balance`
                       : "Swap Now"
                   }
                   onClick={executeTransaction}

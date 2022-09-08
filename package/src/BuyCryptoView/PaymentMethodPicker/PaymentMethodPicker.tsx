@@ -4,7 +4,7 @@ import { PaymentMethodPickerProps } from "./PaymentMethodPicker.models";
 import styles from "./PaymentMethodPicker.module.css";
 import commonStyles from "../../styles.module.css";
 import { useTranslation } from "react-i18next";
-import { genPaymentMethodOptionEvent } from "../../hooks/gtm/buyCryptoViewEvents";
+// import { genPaymentMethodOptionEvent } from "../../hooks/gtm/buyCryptoViewEvents";
 import { useGTMDispatch } from "../../hooks/gtm";
 
 const Skeleton = React.forwardRef<
@@ -65,7 +65,7 @@ const PaymentMethodPicker: React.FC<PaymentMethodPickerProps> = (
 
   const containerRef = useRef<HTMLUListElement>(null);
   const itemsLengthRef = useRef<Number>(items.length);
-  const sendDataToGTM = useGTMDispatch();
+  // const sendDataToGTM = useGTMDispatch();
 
   const setMaxLength = (value: number) => {
     _setMaxLength(value);
@@ -211,7 +211,7 @@ const PaymentMethodPicker: React.FC<PaymentMethodPickerProps> = (
               item.id === props.selectedId ? " " + styles.selected : ""
             }`}
             onClick={() => {
-              sendDataToGTM(genPaymentMethodOptionEvent(item.id));
+              // sendDataToGTM(genPaymentMethodOptionEvent(item.id));
               props.onChange(item);
             }}
           >
@@ -229,7 +229,7 @@ const PaymentMethodPicker: React.FC<PaymentMethodPickerProps> = (
             itemProp="option"
             className={styles["option-wrapper"]}
             onClick={() => {
-              sendDataToGTM(genPaymentMethodOptionEvent("other"));
+              // sendDataToGTM(genPaymentMethodOptionEvent("other"));
               props.openMoreOptions?.();
             }}
           >

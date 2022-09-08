@@ -8,7 +8,7 @@ import React, {
 import styles from "./CurrencyInput.module.css";
 import { APIContext } from "../../../ApiContext";
 import { onChangeTextNumber } from "../../../utils";
-import { amountClickGtmEvent } from "../../../hooks/gtm/buyCryptoViewEvents";
+// import { amountClickGtmEvent } from "../../../hooks/gtm/buyCryptoViewEvents";
 import { useGTMDispatch } from "../../../hooks/gtm";
 
 const defaultPrecision = 2;
@@ -78,7 +78,7 @@ const CurrencyInput: React.FC = () => {
         isFocused ? styles["is-focused"] : ""
       } ${hasError ? styles["with-error"] : ""}`}
       onClick={() => {
-        sendDataToGTM(amountClickGtmEvent);
+        // sendDataToGTM(amountClickGtmEvent);
         inputRef.current?.focus();
       }}
     >

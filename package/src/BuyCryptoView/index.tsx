@@ -11,12 +11,11 @@ import TabsHeader from "../common/Header/TabsHeader/TabsHeader";
 import { tabNames } from "./constants";
 import { triggerLandingViewGtmCtfEvent } from "../helpers/useGTM";
 import { GtmEvent } from "../enums";
-import {
-  buyTabClickGtmEvent,
-  sellTabClickGtmEvent,
-  menuBtnClickGtmEvent,
-} from "../hooks/gtm/buyCryptoViewEvents";
-import { useGTMDispatch } from "../hooks/gtm";
+// import {
+//   buyTabClickGtmEvent,
+//   sellTabClickGtmEvent,
+//   menuBtnClickGtmEvent,
+// } from "../hooks/gtm/buyCryptoViewEvents";
 import Menu from "../common/Header/Menu/Menu";
 import tabHeaderClasses from "./../common/Header/TabsHeader/TabsHeader.module.css";
 
@@ -27,7 +26,6 @@ const BuyCryptoView: React.FC = () => {
   const { data, inputInterface, collected, apiInterface } =
     useContext(APIContext);
   const [initLoadingFinished, setInitLoadingFinished] = useState(false);
-  const sendDataToGTM = useGTMDispatch();
 
   const { handlePaymentMethodChange } = data;
   const { init } = apiInterface;
@@ -96,15 +94,12 @@ const BuyCryptoView: React.FC = () => {
         tabSelected={0}
         onClickItem={(i: number) => {
           if (i === 0) {
-            sendDataToGTM(buyTabClickGtmEvent);
             return;
           }
-          sendDataToGTM(sellTabClickGtmEvent);
           triggerLandingViewGtmCtfEvent(collected, buyStep?.eventCategory);
           nextScreen(<Step nextStep={buyStep} />);
         }}
         onMenuClick={() => {
-          sendDataToGTM(menuBtnClickGtmEvent);
           nextScreen(<Menu className={tabHeaderClasses["tabs-header-menu"]} />);
         }}
       />
