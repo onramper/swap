@@ -79,7 +79,7 @@ const DirectSwapView: React.FC<DirectSwapViewProps> = (props) => {
 
   const { backScreen, nextScreen } = useNav();
   const { updateQuote, loading: quoteLoading } = useUpdateQuote();
-  const { getTokens, loading: tokensLoading } = useGetTokens();
+  const { getTokens } = useGetTokens();
   const { executeTransaction, loading: transactionLoading } =
     useExecuteTransaction();
   const beforeUnLoadRef = useRef<AbortController>(new AbortController());

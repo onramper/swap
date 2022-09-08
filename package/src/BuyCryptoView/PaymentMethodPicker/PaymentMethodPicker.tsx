@@ -4,8 +4,6 @@ import { PaymentMethodPickerProps } from "./PaymentMethodPicker.models";
 import styles from "./PaymentMethodPicker.module.css";
 import commonStyles from "../../styles.module.css";
 import { useTranslation } from "react-i18next";
-// import { genPaymentMethodOptionEvent } from "../../hooks/gtm/buyCryptoViewEvents";
-import { useGTMDispatch } from "../../hooks/gtm";
 
 const Skeleton = React.forwardRef<
   HTMLUListElement,

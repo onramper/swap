@@ -41,7 +41,6 @@ import Footer from "../../common/Footer";
 import Heading from "../../common/Heading/Heading";
 import InputDelegator from "../../common/Input/InputDelegator";
 import OverlayPicker from "../../common/OverlayPicker/OverlayPicker";
-import { CountryIcon } from "@onramper/flag-icons";
 import {
   GtmEvent,
   GtmEventAction,
@@ -529,7 +528,7 @@ const BodyFormView: React.FC<BodyFormViewType> = (props) => {
                         ([code, name]) => ({
                           id: code,
                           name,
-                          iconSvg: <CountryIcon name={code} />,
+                          // iconSvg: <CountryIcon name={code} />,
                           info: code,
                         })
                       )}
@@ -690,7 +689,7 @@ const BodyFormView: React.FC<BodyFormViewType> = (props) => {
                               name: infoObj.phoneCode,
                               info: infoObj.name,
                               searchWords: infoObj.searchWords,
-                              iconSvg: <CountryIcon name={code} />,
+                              // iconSvg: <CountryIcon name={code} />,
                             })
                           )}
                           searchable
@@ -705,12 +704,12 @@ const BodyFormView: React.FC<BodyFormViewType> = (props) => {
                         .phoneCode
                     }
                     error={errorObj?.phoneCountryCode}
-                    renderIconSvg={(props) => (
-                      <CountryIcon
-                        {...props}
-                        name={(collected.country || "GB").toUpperCase()}
-                      />
-                    )}
+                    // renderIconSvg={(props) => (
+                    //   <CountryIcon
+                    //     {...props}
+                    //     name={(collected.country || "GB").toUpperCase()}
+                    //   />
+                    // )}
                   />
                   <InputDelegator
                     error={errorObj?.phoneNumber}
