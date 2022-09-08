@@ -4,10 +4,10 @@ import styles from "../../styles.module.css";
 import Step from "../Step";
 import { sentryHub, ApiError } from "../../ApiContext/api/index";
 import { NextStep, useAPI } from "../../ApiContext";
-import {
-  finishCCTransaction,
-  checkTransaction,
-} from "@onramper/moonpay-adapter";
+// import {
+//   finishCCTransaction,
+//   checkTransaction,
+// } from "@onramper/moonpay-adapter";
 import { NavContext } from "../../NavContext";
 import { PaymentProgressView } from "../PaymentProgressView";
 import {
@@ -68,16 +68,16 @@ const IframeView: React.FC<{
         let returnedNextStep: any; //: NextStep;
         try {
           if (event.data.type === "card-completed") {
-            returnedNextStep = await finishCCTransaction(
-              event.data.transactionId,
-              event.data.ccTokenId
-            );
+            // returnedNextStep = await finishCCTransaction(
+            //   event.data.transactionId,
+            //   event.data.ccTokenId
+            // );
             triggerGTMEvent(gtmPayload);
           } else if (event.data.type === "2fa-completed") {
-            returnedNextStep = await checkTransaction(
-              event.data.moonpayTxId,
-              event.data.onramperTxId
-            );
+            // returnedNextStep = await checkTransaction(
+            //   event.data.moonpayTxId,
+            //   event.data.onramperTxId
+            // );
           } else {
             throw new Error("Unexpected response received");
           }
