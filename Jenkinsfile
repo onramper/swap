@@ -15,8 +15,7 @@ pipeline {
     stages {
         stage('Build') {
             steps{
-                sh 'npm install'
-                sh 'cd package && npm install && npm ci --omit peer &&  npm run build:dev'
+                sh 'cd package && npm install --loglevel verbose && npm ci --omit peer &&  npm run build:dev'
                 sh 'cd iframe && npm install && npm ci && npm run build:dev'
                 sh 'ls -al'
             }   
