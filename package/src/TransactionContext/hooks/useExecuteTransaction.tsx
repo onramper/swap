@@ -2,6 +2,7 @@ import { useSendTransaction } from "@usedapp/core";
 import { lifiChains } from "layer2";
 import { nanoid } from "nanoid";
 import React, { useCallback, useEffect, useRef, useState } from "react";
+import { useGaSwapEvents } from "../../hooks/gtm/useGaSwapEvents";
 import { useNav } from "../../NavContext";
 import {
   NotificationType,
@@ -30,6 +31,7 @@ export const useExecuteTransaction = () => {
   const { sendTransaction, state } = useSendTransaction();
   const { nextScreen } = useNav();
   const beforeUnLoadRef = useRef<AbortController>(new AbortController());
+  const { triggerSwapStartEvent, triggerConfirmSwapEvent } = useGaSwapEvents();
 
   const executeTransaction = useCallback(async () => {
     const destinationAddress = selectedWalletAddress ?? account;
@@ -71,6 +73,7 @@ export const useExecuteTransaction = () => {
           shouldExpire: false,
           id,
         });
+        triggerSwapStartEvent();
         await sendTransaction({
           data: transactionRequest.data,
           from: selectedWalletAddress ?? account,
@@ -99,6 +102,7 @@ export const useExecuteTransaction = () => {
         );
 
         if (res?.transactionRequest) {
+          triggerSwapStartEvent();
           addNotification({
             type: NotificationType.Info,
             message: "Please sign transaction",
@@ -149,6 +153,7 @@ export const useExecuteTransaction = () => {
     tokenIn,
     tokenOut,
     transactionRequest,
+    triggerSwapStartEvent,
   ]);
 
   const handleException = useCallback(
@@ -245,6 +250,7 @@ export const useExecuteTransaction = () => {
 
   useEffect(() => {
     if (state.status === "Mining") {
+      triggerConfirmSwapEvent();
       handleMining();
     }
     if (state.status === "Exception") {
@@ -260,6 +266,7 @@ export const useExecuteTransaction = () => {
     tokenOut,
     handleMining,
     state.status,
+    triggerConfirmSwapEvent,
   ]);
 
   useEffect(() => {

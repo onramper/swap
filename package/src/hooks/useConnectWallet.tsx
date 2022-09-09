@@ -6,6 +6,7 @@ import {
   useWidgetNotifications,
 } from "../NotificationContext";
 import { isErrorWithMessage } from "../ApiContext/api";
+import { useGaSwapEvents } from "./gtm/useGaSwapEvents";
 
 interface ConnectWallet {
   disconnect: () => void;
@@ -37,6 +38,7 @@ export const useConnectWallet = (): ConnectWallet => {
 
   const [connectionPending, setConnectionPending] = useState(false);
   const { addNotification } = useWidgetNotifications();
+  const { triggerWalletConnectEvent } = useGaSwapEvents();
 
   useEffect(() => {
     if (active && account) {
@@ -88,6 +90,7 @@ export const useConnectWallet = (): ConnectWallet => {
         setConnectionError(null);
         setConnectionPending(true);
         activateBrowserWallet();
+        triggerWalletConnectEvent();
       } catch (e) {
         if (isErrorWithMessage(e)) {
           setConnectionError(e as Error);
@@ -109,7 +112,7 @@ export const useConnectWallet = (): ConnectWallet => {
       setConnectionError(new Error("Metamask not enabled!"));
       setConnectionPending(false);
     }
-  }, [activateBrowserWallet, addNotification]);
+  }, [activateBrowserWallet, addNotification, triggerWalletConnectEvent]);
 
   const disconnect = () => {
     setConnectionError(null);

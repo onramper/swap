@@ -17,8 +17,8 @@ import { NotificationProvider } from "./NotificationContext";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { PaymentProgressView } from "./steps/PaymentProgressView";
 import { L2Provider } from "./web3/config";
-// import { GTM_ID } from "./ApiContext/api/constants";
-// import { GTMProvider } from "./hooks/gtm";
+import { GTM_ID } from "./ApiContext/api/constants";
+import { GTMProvider } from "./hooks/gtm";
 import DirectSwapView from "./steps/SwapOverviewView/DirectSwapView/DirectSwapView";
 
 type OnramperSwapProps = Omit<APIProviderType, "themeColor"> & {
@@ -42,10 +42,10 @@ const OnramperSwap: React.FC<OnramperSwapProps> = (props) => {
     "--font-family": fontFamily,
   } as React.CSSProperties;
 
-  // const gtmParams = {
-  //   gtmId: GTM_ID,
-  //   dataLayer: { apiKey: props.API_KEY },
-  // };
+  const gtmParams = {
+    gtmId: GTM_ID,
+    dataLayer: { apiKey: props.API_KEY },
+  };
 
   return (
     <BrowserRouter>
@@ -66,59 +66,59 @@ const OnramperSwap: React.FC<OnramperSwapProps> = (props) => {
             setFlagRestart((old) => ++old);
           }}
         >
-          {/* <GTMProvider state={gtmParams}> */}
-          <NavProvider>
-            <APIProvider //TODO: clean api context
-              API_KEY={props.API_KEY}
-              defaultAmount={props.defaultAmount}
-              defaultAddrs={props.defaultAddrs}
-              defaultCrypto={props.defaultCrypto}
-              defaultFiat={props.defaultFiat}
-              defaultFiatSoft={props.defaultFiatSoft}
-              defaultPaymentMethod={props.defaultPaymentMethod}
-              filters={props.filters}
-              country={props.country}
-              language={props.language}
-              isAddressEditable={props.isAddressEditable}
-              themeColor={color.slice(1)}
-              displayChatBubble={props.displayChatBubble}
-              amountInCrypto={props.amountInCrypto}
-              partnerContext={props.partnerContext}
-              redirectURL={props.redirectURL}
-              minAmountEur={props.minAmountEur}
-              supportSell={props.supportSell}
-              supportBuy={props.supportBuy}
-              isAmountEditable={props.isAmountEditable}
-              recommendedCryptoCurrencies={props.recommendedCryptoCurrencies}
-              selectGatewayBy={props.selectGatewayBy}
-            >
-              <L2Provider>
-                <TransactionContextProvider>
-                  <NotificationProvider>
-                    <Routes>
-                      <Route
-                        path="/"
-                        element={
-                          <div style={{ flexGrow: 1, display: "flex" }}>
-                            <NavContainer home={<DirectSwapView />} />
-                          </div>
-                        }
-                      />
-                      <Route
-                        path="/:txId"
-                        element={
-                          <div style={{ flexGrow: 1, display: "flex" }}>
-                            <NavContainer home={<PaymentProgressView />} />
-                          </div>
-                        }
-                      />
-                    </Routes>
-                  </NotificationProvider>
-                </TransactionContextProvider>
-              </L2Provider>
-            </APIProvider>
-          </NavProvider>
-          {/* </GTMProvider> */}
+          <GTMProvider state={gtmParams}>
+            <NavProvider>
+              <APIProvider //TODO: clean api context
+                API_KEY={props.API_KEY}
+                defaultAmount={props.defaultAmount}
+                defaultAddrs={props.defaultAddrs}
+                defaultCrypto={props.defaultCrypto}
+                defaultFiat={props.defaultFiat}
+                defaultFiatSoft={props.defaultFiatSoft}
+                defaultPaymentMethod={props.defaultPaymentMethod}
+                filters={props.filters}
+                country={props.country}
+                language={props.language}
+                isAddressEditable={props.isAddressEditable}
+                themeColor={color.slice(1)}
+                displayChatBubble={props.displayChatBubble}
+                amountInCrypto={props.amountInCrypto}
+                partnerContext={props.partnerContext}
+                redirectURL={props.redirectURL}
+                minAmountEur={props.minAmountEur}
+                supportSell={props.supportSell}
+                supportBuy={props.supportBuy}
+                isAmountEditable={props.isAmountEditable}
+                recommendedCryptoCurrencies={props.recommendedCryptoCurrencies}
+                selectGatewayBy={props.selectGatewayBy}
+              >
+                <L2Provider>
+                  <TransactionContextProvider>
+                    <NotificationProvider>
+                      <Routes>
+                        <Route
+                          path="/"
+                          element={
+                            <div style={{ flexGrow: 1, display: "flex" }}>
+                              <NavContainer home={<DirectSwapView />} />
+                            </div>
+                          }
+                        />
+                        <Route
+                          path="/:txId"
+                          element={
+                            <div style={{ flexGrow: 1, display: "flex" }}>
+                              <NavContainer home={<PaymentProgressView />} />
+                            </div>
+                          }
+                        />
+                      </Routes>
+                    </NotificationProvider>
+                  </TransactionContextProvider>
+                </L2Provider>
+              </APIProvider>
+            </NavProvider>
+          </GTMProvider>
         </ErrorBoundary>
       </div>
     </BrowserRouter>
