@@ -2,7 +2,7 @@ import React from "react";
 import styles from "./ViewList.module.css";
 import { ViewListItemProps } from "./ViewList.models";
 import { ImageWithFallback } from "../ImageWithFallback/ImageWithFallback";
-import Fallback from "../../icons/fallback_token_icon.svg";
+import Fallback from "../../icons/fees.svg";
 
 const ListItem: React.FC<ViewListItemProps> = (props: ViewListItemProps) => {
   return (
