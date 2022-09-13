@@ -8,8 +8,17 @@ resource "aws_s3_bucket" "onramper-swap-dev" {
 
 resource "aws_s3_bucket_public_access_block" "swap-dev-acl" {
   bucket = aws_s3_bucket.onramper-swap-dev.id
-  block_public_acls       = false
-  block_public_policy     = false
-  ignore_public_acls      = false
-  restrict_public_buckets = false
+  acl    = "public-read" 
+  tags = {
+    Name        = "swap"
+    Environment = "Dev"
+  }
+}
+
+resource "aws_s3_bucket_object" "object" {
+  for_each = fileset("iframe/build/", "*")
+  bucket = aws_s3_bucket.onramper-swap-dev.id
+  key    = "each.value"
+  acl    = "public-read" 
+  source = "iframe/build/${each.value}"
 }
