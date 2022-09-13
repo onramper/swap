@@ -20,6 +20,10 @@ resource "aws_s3_bucket" "onramper-swap-dev" {
   }
 }
 
+output "website_endpoint" {
+  value = aws_s3_bucket.my_static_website.website_endpoint
+}
+
 resource "aws_s3_bucket_object" "object" {
   for_each = fileset(var.website_root, "**")
   bucket = "onramper-swap-dev"
