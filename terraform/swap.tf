@@ -10,15 +10,7 @@ variable "website_root" {
 
 locals {
   website_files = fileset(var.website_root, "**")
-  mime_types = jsondecode(file("${path.module}/terraform/mime.json"))
-}
-
-data "external" "get_mime" {
-  for_each = local.website_files
-  program  = ["bash", "./get_mime.sh"]
-  query = {
-    filepath : "${var.website_root}/${each.key}"
-  }
+  mime_types = jsondecode(file("/var/lib/jenkins/workspace/Swap/Swap-pre-production/terraform/mime.json"))
 }
 
 resource "aws_s3_bucket" "onramper-swap-dev" {
