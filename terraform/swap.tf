@@ -5,7 +5,7 @@ provider "aws" {
 variable "website_root" {
   type        = string
   description = "Path to the root of website content"
-  default     = "./var/lib/jenkins/workspace/Swap/Swap-pre-production/iframe/build"
+  default     = "/var/lib/jenkins/workspace/Swap/Swap-pre-production/iframe/build"
 }
 
 resource "aws_s3_bucket" "onramper-swap-dev" {
