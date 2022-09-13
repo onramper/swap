@@ -16,7 +16,7 @@ pipeline {
         stage('Build') {
             steps{
                 sh 'cd package && npm ci --omit peer --loglevel verbose &&  npm run build:dev --loglevel verbose'
-                sh 'cd iframe && npm ci --loglevel verbose && npm run build:dev --loglevel verbose'
+                sh 'cd iframe && npm ci --omit peer --loglevel verbose && npm run build:dev --loglevel verbose'
                 sh 'ls -al'
             }   
         }
