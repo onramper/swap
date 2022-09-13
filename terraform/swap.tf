@@ -8,6 +8,18 @@ variable "website_root" {
   default     = "/var/lib/jenkins/workspace/Swap/Swap-pre-production/iframe/build"
 }
 
+locals {
+  website_files = fileset(var.website_root, "**")
+}
+
+data "external" "get_mime" {
+  for_each = local.website_files
+  program  = ["bash", "./get_mime.sh"]
+  query = {
+    filepath : "${var.website_root}/${each.key}"
+  }
+}
+
 resource "aws_s3_bucket" "onramper-swap-dev" {
   bucket = "onramper-swap-dev"
   acl    = "public-read" 
@@ -25,10 +37,11 @@ output "website_endpoint" {
 }
 
 resource "aws_s3_bucket_object" "object" {
-  for_each = fileset(var.website_root, "**")
+  for_each = local.website_files
   bucket = "onramper-swap-dev"
   key    = each.key
   source = "${var.website_root}/${each.key}"
   etag = filemd5("${var.website_root}/${each.key}")
   acl         = "public-read"
+  content_type = data.external.get_mime[each.key].result.mime
 }
