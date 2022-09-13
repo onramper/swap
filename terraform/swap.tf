@@ -15,6 +15,9 @@ resource "aws_s3_bucket" "onramper-swap-dev" {
     Name        = "swap"
     Environment = "Dev"
   }
+  website {
+    index_document = "index.html"
+  }
 }
 
 resource "aws_s3_bucket_object" "object" {
