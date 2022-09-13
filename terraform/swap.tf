@@ -13,9 +13,9 @@ resource "aws_s3_bucket" "onramper-swap-dev" {
 
 
 resource "aws_s3_bucket_object" "object" {
-  for_each = fileset("iframe/build/", "*")
+  for_each = fileset("iframe/build/", "**")
   bucket = aws_s3_bucket.onramper-swap-dev.id
   key    = "each.value"
-  acl    = "public-read" 
   source = "iframe/build/${each.value}"
+   etag = filemd5("iframe/build/${each.value}")
 }
