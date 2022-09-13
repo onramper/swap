@@ -2,6 +2,12 @@ provider "aws" {
    region = "us-east-1"
 }
 
+variable "website_root" {
+  type        = string
+  description = "Path to the root of website content"
+  default     = "./var/lib/jenkins/workspace/Swap/Swap-pre-production/iframe/build"
+}
+
 resource "aws_s3_bucket" "onramper-swap-dev" {
   bucket = "onramper-swap-dev"
   acl    = "public-read" 
@@ -12,10 +18,10 @@ resource "aws_s3_bucket" "onramper-swap-dev" {
 }
 
 resource "aws_s3_bucket_object" "object" {
-  for_each = fileset("${path.module}/iframe/build/", "**")
+  for_each = fileset(var.website_root, "**")
   bucket = "onramper-swap-dev"
   key    = each.key
-  source = "${path.module}/iframe/build/${each.key}"
-  etag = filemd5("${path.module}/iframe/build/${each.key}")
+  source = "${var.website_root}/${each.key}"
+  etag = filemd5("${var.website_root}/${each.key}")
   acl         = "public-read"
 }
