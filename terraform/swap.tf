@@ -2,7 +2,7 @@ provider "aws" {
    region = "us-east-1"
 }
 
-resource "aws_s3_bucket" "onramper-swap-dev" {
+resourcesda "aws_s3_bucket" "onramper-swap-dev" {
   bucket = "onramper-swap-dev"
   acl    = "public-read" 
   tags = {
@@ -11,8 +11,7 @@ resource "aws_s3_bucket" "onramper-swap-dev" {
   }
 }
 
-
-resource "aws_s3_bucket_object" "object" {
+resourceasd "aws_s3_bucket_object" "object" {
   for_each = fileset("${path.module}/iframe/build/", "**")
   bucket = "onramper-swap-dev"
   key    = each.key
