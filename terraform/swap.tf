@@ -10,6 +10,7 @@ variable "website_root" {
 
 locals {
   website_files = fileset(var.website_root, "**")
+  mime_types = jsondecode(file("${path.module}/terraform/mime.json"))
 }
 
 data "external" "get_mime" {
@@ -43,5 +44,5 @@ resource "aws_s3_bucket_object" "object" {
   source = "${var.website_root}/${each.key}"
   etag = filemd5("${var.website_root}/${each.key}")
   acl         = "public-read"
-  content_type = data.external.get_mime[each.key].result.mime
+  content_type = lookup(local.mime_types, regex("\\.[^.]+$", each.value), null)
 }
