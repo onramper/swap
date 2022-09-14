@@ -29,6 +29,25 @@ output "website_endpoint" {
   value = aws_s3_bucket.onramper-swap-dev.website_endpoint
 }
 
+resource "aws_s3_bucket_policy" "b" {
+  bucket = aws_s3_bucket.onramper-swap-dev.id
+
+  policy = <<POLICY
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Sid": "Statement1",
+            "Effect": "Allow",
+            "Principal": "*",
+            "Action": "s3:GetObject",
+            "Resource": "arn:aws:s3:::onramper-swap-temp/*"
+        }
+    ]
+}
+POLICY
+}
+
 resource "aws_s3_bucket_object" "object" {
   for_each = local.website_files
   bucket = "onramper-swap-dev"
