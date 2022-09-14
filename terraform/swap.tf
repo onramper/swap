@@ -15,7 +15,7 @@ locals {
 
 resource "aws_s3_bucket" "onramper-swap-dev" {
   bucket = "onramper-swap-dev"
-  acl    = "public-read" 
+  acl    = "private" 
   tags = {
     Name        = "swap"
     Environment = "Dev"
