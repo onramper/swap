@@ -10,7 +10,7 @@ import {
 } from "./errors";
 
 import { NavContext } from "../../NavContext";
-import BuyCryptoView from "../../BuyCryptoView";
+// import BuyCryptoView from "../../BuyCryptoView";
 import { APIContext } from "../../ApiContext";
 import ProgressHeader from "../Header/ProgressHeader/ProgressHeader";
 
@@ -50,7 +50,7 @@ const ErrorView: React.FC<ErrorViewProps> = (props) => {
 
   useEffect(() => {
     if (isRestartCalled && !collected.errors) {
-      onlyScreen(<BuyCryptoView />);
+      // onlyScreen(<BuyCryptoView />);
       setIsRestartCalled(false);
     }
   }, [collected.errors, isRestartCalled, onlyScreen]);

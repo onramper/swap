@@ -4,7 +4,7 @@ import styles from "./styles.module.css";
 
 import { NavContext } from "../../NavContext";
 import { APIContext } from "../../ApiContext";
-import BuyCryptoView from "../../BuyCryptoView";
+// import BuyCryptoView from "../../BuyCryptoView";
 
 import { ReactComponent as TICK_GREEN } from "../../icons/success_green.svg";
 import { ReactComponent as TICK_BLUE } from "../../icons/success_blue.svg";
@@ -70,7 +70,7 @@ const BodySuccessView: React.FC<BodySuccessViewType> = (props) => {
           onClick={
             collected.redirectURL
               ? () => window.open(collected.redirectURL, "_parent")
-              : () => onlyScreen(<BuyCryptoView />)
+              : () => onlyScreen(<div />)
           }
           className={`${styles["button--basic"]} ${
             props.txType === "pending"

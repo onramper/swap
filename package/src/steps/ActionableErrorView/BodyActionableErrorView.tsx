@@ -7,7 +7,7 @@ import { NextStep } from "../../ApiContext";
 
 import { ReactComponent as ERROR } from "../../icons/error.svg";
 import Step from "../Step";
-import BuyCryptoView from "../../BuyCryptoView";
+// import BuyCryptoView from "../../BuyCryptoView";
 
 type ActionableErrorViewType = {
   title?: string;
@@ -19,43 +19,36 @@ type ActionableErrorViewType = {
 };
 
 const BodyActionableErrorView: React.FC<ActionableErrorViewType> = (props) => {
-
-  const { replaceScreen, nextScreen } = useContext(NavContext);
+  const { replaceScreen } = useContext(NavContext);
 
   return (
     <main className={`${stylesCommon.body}`}>
       <div
         className={`${stylesCommon.body__child} ${stylesCommon.grow} ${styles.body}`}
       >
-
         <ERROR className={styles["fail-icon"]} />
 
-        {!!props.title && (
-          <span className={styles.title}>
-            { props.title }
-          </span>
-        )}
+        {!!props.title && <span className={styles.title}>{props.title}</span>}
         <span className={styles.info}>
-          {props.message ? props.message : "Something has gone wrong. Please try again."}
+          {props.message
+            ? props.message
+            : "Something has gone wrong. Please try again."}
         </span>
 
-
-        {!!props.optionalUrl  && (
+        {!!props.optionalUrl && (
           <button
-          onClick={ () => window.open(props.optionalUrl) }
-          className={`${styles["button--basic"]} ${
-            styles["button--instant"]
-          }`}
-        >
-          { "Contact Coinify" }
-        </button>
+            onClick={() => window.open(props.optionalUrl)}
+            className={`${styles["button--basic"]} ${styles["button--instant"]}`}
+          >
+            {"Contact Coinify"}
+          </button>
         )}
 
-        {(!!props.step || props.fatal! === true) &&
-          (<button
+        {(!!props.step || props.fatal! === true) && (
+          <button
             onClick={
-            (props.fatal === false) ?
-              () => {
+              props.fatal === false
+                ? () => {
                     replaceScreen(
                       <Step
                         gtmToBeRegisterStep={props.parentStep}
@@ -63,16 +56,15 @@ const BodyActionableErrorView: React.FC<ActionableErrorViewType> = (props) => {
                       />
                     );
                   }
-            : () => {
-                nextScreen(<BuyCryptoView />);
-              } }
-            className={`${styles["button--basic"]} ${
-              styles["button--instant"]
-            }`}
+                : () => {
+                    // nextScreen(<BuyCryptoView />);
+                  }
+            }
+            className={`${styles["button--basic"]} ${styles["button--instant"]}`}
           >
-            { props.fatal === false ? "Try again" : "Try another gateway" }
+            {props.fatal === false ? "Try again" : "Try another gateway"}
           </button>
-          )}
+        )}
       </div>
     </main>
   );
