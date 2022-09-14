@@ -12,7 +12,7 @@ import {
 import { APIContext, NextStep } from "../../ApiContext";
 import { NavContext } from "../../NavContext";
 
-import BuyCryptoView from "../../BuyCryptoView";
+// import BuyCryptoView from "../../BuyCryptoView";
 import { ButtonAction } from "../../common/Buttons";
 import Step from "../Step";
 import { StepType } from "../../ApiContext/api/types/nextStep";
@@ -55,7 +55,7 @@ const PopupLauncherView: React.FC<PopupLauncherViewType> = (props) => {
 
   useEffect(() => {
     if (isRestartCalled && !collected.errors) {
-      onlyScreen(<BuyCryptoView />);
+      // onlyScreen(<BuyCryptoView />);
       setIsRestartCalled(false);
     }
   }, [

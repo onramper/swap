@@ -28,7 +28,7 @@ import SwapOverviewView from "../SwapOverviewView/SwapOverviewView";
 import { StepType } from "../../ApiContext/api/types/nextStep";
 import { useNavigate, useParams } from "react-router-dom";
 import { useAPI } from "../../ApiContext";
-import BuyCryptoView from "../../BuyCryptoView";
+// import BuyCryptoView from "../../BuyCryptoView";
 import { getNativeToken } from "../../utils";
 
 // const res = {
@@ -182,7 +182,7 @@ export const PaymentProgressView = (props: PaymentProgressViewProps) => {
     navigate("/", { replace: true });
     collected.redirectURL
       ? window.open(collected.redirectURL, "_parent")
-      : onlyScreen(<BuyCryptoView />);
+      : onlyScreen(<div />);
   };
 
   return (
