@@ -2,6 +2,7 @@ import { useSendTransaction } from "@usedapp/core";
 import { lifiChains } from "layer2";
 import { nanoid } from "nanoid";
 import React, { useCallback, useEffect, useRef, useState } from "react";
+import { storeTransactionData } from "../../ApiContext/api";
 import { useGaSwapEvents } from "../../hooks/gtm/useGaSwapEvents";
 import { useNav } from "../../NavContext";
 import {
@@ -22,13 +23,11 @@ export const useExecuteTransaction = () => {
     tokenOut,
     transactionRequest,
     selectedWalletAddress,
-    txId,
     slippageTolerance,
   } = useTransactionContext();
   const { addNotification, removeNotification } = useWidgetNotifications();
-  // const balance = useEtherBalance(account);
   const [loading, setLoading] = useState<boolean>(false);
-  const { sendTransaction, state } = useSendTransaction();
+  const { sendTransaction, state, resetState } = useSendTransaction();
   const { nextScreen } = useNav();
   const beforeUnLoadRef = useRef<AbortController>(new AbortController());
   const { triggerSwapStartEvent, triggerConfirmSwapEvent } = useGaSwapEvents();
@@ -214,27 +213,30 @@ export const useExecuteTransaction = () => {
           );
         }
       }
+      resetState();
     },
-    [nextScreen]
+    [nextScreen, resetState]
   );
 
   const handleMining = useCallback(async () => {
     if (state.transaction && account) {
       console.log(state.transaction);
       try {
-        // storeTransactionData({
-        //   address: account,
-        //   fromAmount: inAmount,
-        //   toAmount: 0,
-        //   txHash: state.transaction.hash,
-        //   fromCurrency: tokenIn.symbol,
-        //   toCurrency: tokenOut.symbol,
-        //   status: "pending",
-        //   bridge: "",
-        //   country: "",
-        //   partnerKey: "",
-        //   txData: state.transaction,
-        // });
+        storeTransactionData({
+          address: account,
+          fromAmount: inAmount,
+          toAmount: 0,
+          fromChain: 3,
+          toChain: 3,
+          txHash: state.transaction.hash,
+          fromCurrency: tokenIn.symbol,
+          toCurrency: tokenOut.symbol,
+          status: "pending",
+          bridge: "hop",
+          country: "LK",
+          partnerKey: "",
+          txData: state.transaction,
+        });
       } catch (error) {
         console.log(error);
       }
@@ -249,6 +251,7 @@ export const useExecuteTransaction = () => {
   }, [account, nextScreen, state.transaction, tokenOut]);
 
   useEffect(() => {
+    debugger;
     if (state.status === "Mining") {
       triggerConfirmSwapEvent();
       handleMining();
@@ -258,12 +261,8 @@ export const useExecuteTransaction = () => {
     }
   }, [
     handleException,
-    account,
-    nextScreen,
-    txId,
     state.errorMessage,
     state.errorCode,
-    tokenOut,
     handleMining,
     state.status,
     triggerConfirmSwapEvent,

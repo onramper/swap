@@ -12,6 +12,7 @@ import { useTransactionCtxActions } from "./useTransactionCtxActions";
 
 export const useUpdateQuote = () => {
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(false);
   const { addNotification, removeNotification } = useWidgetNotifications();
   const { selectedWalletAddress, slippageTolerance } = useTransactionContext();
   const { setQuote, setTransactionRequest } = useTransactionCtxActions();
@@ -25,6 +26,7 @@ export const useUpdateQuote = () => {
       const fromAddress = account ?? dummyAccount;
       const destinationAddress = selectedWalletAddress ?? account;
       setLoading(true);
+      setError(false);
       try {
         const id = nanoid();
         addNotification({
@@ -60,6 +62,12 @@ export const useUpdateQuote = () => {
           }
         }
       } catch (error) {
+        setError(true);
+        addNotification({
+          type: NotificationType.Error,
+          message: "Unable to find a quote for the requested transfer",
+          shouldExpire: true,
+        });
         if (isErrorWithName(error) && error.name === "AbortError") {
           return;
         }
@@ -80,6 +88,7 @@ export const useUpdateQuote = () => {
 
   return {
     loading,
+    error,
     updateQuote,
   };
 };

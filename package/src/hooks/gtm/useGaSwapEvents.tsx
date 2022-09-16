@@ -1,5 +1,7 @@
-import { useCallback } from "react";
+import { useCallback, useContext } from "react";
 import { useGTMDispatch } from ".";
+import { APIContext } from "../../ApiContext";
+import { useTransactionContext } from "../../TransactionContext/hooks";
 
 interface GtmEvent {
   event: string;
@@ -7,10 +9,28 @@ interface GtmEvent {
   trigger: string;
   label: string;
   action: string;
+  value?: any;
 }
 
 export const useGaSwapEvents = () => {
   const sendDataToGTM = useGTMDispatch();
+  const { tokenIn, tokenOut } = useTransactionContext();
+  const {
+    data: { country },
+  } = useContext(APIContext);
+
+  const setTxnContext = useCallback(() => {
+    return {
+      crypto: {
+        inToken: tokenIn.symbol,
+        outToken: tokenOut.symbol,
+        dex: "lifi",
+      },
+      location: {
+        country,
+      },
+    };
+  }, [country, tokenIn.symbol, tokenOut.symbol]);
 
   const triggerWalletConnectEvent = useCallback(() => {
     const event: GtmEvent = {
@@ -30,9 +50,10 @@ export const useGaSwapEvents = () => {
       trigger: "the swap successfully started and metamask is open",
       label: "swapStart",
       action: "step 4",
+      value: setTxnContext(),
     };
     sendDataToGTM(event);
-  }, [sendDataToGTM]);
+  }, [sendDataToGTM, setTxnContext]);
 
   const triggerConfirmSwapEvent = useCallback(() => {
     const event: GtmEvent = {

@@ -9,6 +9,8 @@ export type ViewListItemProps = {
   index: number;
   onClick: (index: number) => void;
   isSelected?: boolean;
+  fallbackIcon?: string;
+  icon?: string;
 } & ItemType &
   ViewListItemType;
 

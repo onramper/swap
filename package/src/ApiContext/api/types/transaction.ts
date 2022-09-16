@@ -39,6 +39,8 @@ export interface RawData {
   transactionId?: string;
   fromCurrency: string;
   toCurrency: string;
+  fromChain: number;
+  toChain: number;
   fromAmount: number;
   toAmount: number;
   partnerKey: string;

@@ -13,6 +13,7 @@ export interface ItemType {
   name: string;
   info?: string;
   icon?: string;
+  fallbackIcon?: string;
   iconSvg?: JSX.Element;
   symbol?: string;
   precision?: number;
@@ -99,23 +100,8 @@ export type TypesOfRateError =
   | "OPTION";
 
 export type DataStateType = {
-  availableCryptos: ItemType[];
-  availableCurrencies: ItemType[];
-  availablePaymentMethods: ItemType[];
-  allRates: GatewayRateOption[];
-  handleCryptoChange: (crypto?: ItemType) => undefined | {};
-  handleCurrencyChange: (currency?: ItemType) => undefined | {};
-  handlePaymentMethodChange: (paymentMehtod?: ItemType) => undefined | {};
+  country: string;
   restartWidget: () => void;
-  //remote responses
-  responseGateways?: GatewaysResponse;
-  filtredGatewaysByCrypto: GatewaysResponse["gateways"];
-  filtredGatewaysByCurrency: GatewaysResponse["gateways"];
-  mappedHiddenByFiat: GatewayRateOptionSimple[];
-  responseRate?: RateResponse;
-  ICONS_MAP?: {
-    [key: string]: { icon: string; name: string; symbol?: string };
-  };
 };
 
 export type InputInterfaceType = {
@@ -123,12 +109,11 @@ export type InputInterfaceType = {
 };
 
 export type ApiInterfaceType = {
-  init: (country?: string) => Promise<ErrorObjectType | undefined | {}>;
+  // getCountry: () => void;
   executeStep: (
     step: NextStep,
     params: { [key: string]: any }
   ) => Promise<NextStep>;
-  getRates: () => Promise<ErrorObjectType | undefined | {}>;
   clearErrors: () => void;
 };
 
@@ -157,27 +142,14 @@ export const initialState: StateType = {
     recommendedCryptoCurrencies: undefined,
   },
   data: {
-    availableCryptos: [],
-    availableCurrencies: [],
-    availablePaymentMethods: [],
-    allRates: [],
-    handleCryptoChange: () => undefined,
-    handleCurrencyChange: () => undefined,
-    handlePaymentMethodChange: () => undefined,
+    country: "",
     restartWidget: () => undefined,
-    responseGateways: undefined,
-    filtredGatewaysByCrypto: [],
-    filtredGatewaysByCurrency: [],
-    responseRate: undefined,
-    mappedHiddenByFiat: [],
   },
   inputInterface: {
     handleInputChange: () => null,
   },
   apiInterface: {
-    init: async () => undefined,
     executeStep: async (nextStep: NextStep) => nextStep,
-    getRates: async () => undefined,
     clearErrors: () => undefined,
   },
 };
