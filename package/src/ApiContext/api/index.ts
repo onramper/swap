@@ -295,7 +295,6 @@ async function getCountry() {
 
 function storeTransactionData(data: RawData) {
   if (data.address && data.txData) {
-    debugger;
     if (!isTransactionHash(data.txHash)) {
       throw new Error("Invalid transaction hash");
     }

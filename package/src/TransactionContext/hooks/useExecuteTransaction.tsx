@@ -2,7 +2,6 @@ import { useSendTransaction } from "@usedapp/core";
 import { lifiChains } from "layer2";
 import { nanoid } from "nanoid";
 import React, { useCallback, useEffect, useRef, useState } from "react";
-import { storeTransactionData } from "../../ApiContext/api";
 import { useGaSwapEvents } from "../../hooks/gtm/useGaSwapEvents";
 import { useNav } from "../../NavContext";
 import {
@@ -220,23 +219,23 @@ export const useExecuteTransaction = () => {
 
   const handleMining = useCallback(async () => {
     if (state.transaction && account) {
-      console.log(state.transaction);
+      // console.log(state.transaction);
       try {
-        storeTransactionData({
-          address: account,
-          fromAmount: inAmount,
-          toAmount: 0,
-          fromChain: 3,
-          toChain: 3,
-          txHash: state.transaction.hash,
-          fromCurrency: tokenIn.symbol,
-          toCurrency: tokenOut.symbol,
-          status: "pending",
-          bridge: "hop",
-          country: "LK",
-          partnerKey: "",
-          txData: state.transaction,
-        });
+        // storeTransactionData({
+        //   address: account,
+        //   fromAmount: inAmount,
+        //   toAmount: 0,
+        //   fromChain: 3,
+        //   toChain: 3,
+        //   txHash: state.transaction.hash,
+        //   fromCurrency: tokenIn.symbol,
+        //   toCurrency: tokenOut.symbol,
+        //   status: "pending",
+        //   bridge: "hop",
+        //   country: "LK",
+        //   partnerKey: "",
+        //   txData: state.transaction,
+        // });
       } catch (error) {
         console.log(error);
       }
@@ -251,7 +250,6 @@ export const useExecuteTransaction = () => {
   }, [account, nextScreen, state.transaction, tokenOut]);
 
   useEffect(() => {
-    debugger;
     if (state.status === "Mining") {
       triggerConfirmSwapEvent();
       handleMining();

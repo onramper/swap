@@ -1,5 +1,4 @@
-import { GatewaysResponse } from "./api/types/gateways";
-import { RateResponse, GatewayRate } from "./api/types/rate";
+import { GatewayRate } from "./api/types/rate";
 import { NextStep } from "./api/types/nextStep";
 
 export type GatewayRateOption = { id: string; name: string } & GatewayRate;
