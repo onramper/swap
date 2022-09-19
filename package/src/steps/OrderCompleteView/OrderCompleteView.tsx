@@ -13,6 +13,7 @@ import { useNavigate } from "react-router-dom";
 import { useAddTokenToMetamask } from "../../web3/hooks/useAddTokenToMetamask";
 import DirectSwapView from "../SwapOverviewView/DirectSwapView/DirectSwapView";
 import { useWidgetNotifications } from "../../NotificationContext";
+import { useTransactionCtxActions } from "../../TransactionContext/hooks";
 
 const OrderCompleteView: React.FC<{
   description: string;
@@ -24,6 +25,7 @@ const OrderCompleteView: React.FC<{
   const [autoPlay, setAutoPlay] = useState(false);
   const { addToken } = useAddTokenToMetamask(props.tokenOut);
   const { removeAllNotifications } = useWidgetNotifications();
+  const { updateInAmount } = useTransactionCtxActions();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -35,6 +37,7 @@ const OrderCompleteView: React.FC<{
 
   const exitHandler = () => {
     removeAllNotifications();
+    updateInAmount(0);
     navigate("/", { replace: true });
     onlyScreen(<DirectSwapView />);
   };
