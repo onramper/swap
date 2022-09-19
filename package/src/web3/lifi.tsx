@@ -30,6 +30,16 @@ export const supportedChains = [
     coin: "ETH",
     id: 4,
   },
+  {
+    name: "Kovan",
+    coin: "ETH",
+    id: 42,
+  },
+  {
+    name: "Goerli",
+    coin: "ETH",
+    id: 5,
+  },
 ];
 
 export const lifi = new LIFI(lifiConfig);

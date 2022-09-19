@@ -24,7 +24,6 @@ export const lifiNativeTokens = async (): Promise<TokenInfo[]> => {
 // for now we just do ethereum,
 export const getNativeToken = async (chainId: number): Promise<TokenInfo> => {
   const chainTokens = await lifiNativeTokens();
-  console.log(chainTokens);
   if (chainTokens) {
     const nativeToken = chainTokens.find((chain) => chain.chainId === chainId);
     if (nativeToken) {
@@ -51,8 +50,6 @@ export const formatTokenAmount = (
   const { decimals } = token;
   return formatUnits(amount, decimals);
 };
-// for quote api
-export const apiKey = "oIMeQOqDsg9vFAs6WU1ks2hFxZ32DONF4MkhyDyI";
 
 export const getDexFromGateway = (
   gateway: string | undefined

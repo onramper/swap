@@ -1,5 +1,4 @@
 import { useSendTransaction } from "@usedapp/core";
-import { lifiChains } from "layer2";
 import { nanoid } from "nanoid";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { useGaSwapEvents } from "../../hooks/gtm/useGaSwapEvents";
@@ -11,7 +10,7 @@ import {
 import OrderCompleteView from "../../steps/OrderCompleteView/OrderCompleteView";
 import TransactionErrorOverlay from "../../steps/SwapOverviewView/TransactionErrorOverlay/TransactionErrorOverlay";
 import { useLayer2 } from "../../web3/config";
-import { getLifiQuote } from "../../web3/lifi";
+import { getLifiQuote, supportedChains } from "../../web3/lifi";
 import { useTransactionContext } from "./useTransactionContext";
 
 export const useExecuteTransaction = () => {
@@ -42,8 +41,8 @@ export const useExecuteTransaction = () => {
       return;
     }
     if (chainId !== tokenIn.chainId) {
-      const tokenInChainName = lifiChains.find(
-        (c) => c.chainId === tokenIn.chainId
+      const tokenInChainName = supportedChains.find(
+        (c) => c.id === tokenIn.chainId
       )?.name;
       if (!tokenInChainName) {
         addNotification({
@@ -157,7 +156,6 @@ export const useExecuteTransaction = () => {
   const handleException = useCallback(
     (status, errorMessage) => {
       if (errorMessage) {
-        //status === "Exception"
         if (errorMessage?.includes("INSUFFICIENT_OUTPUT_AMOUNT")) {
           nextScreen(
             <TransactionErrorOverlay

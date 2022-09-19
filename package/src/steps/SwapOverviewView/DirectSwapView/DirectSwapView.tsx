@@ -97,13 +97,12 @@ const DirectSwapView: React.FC<DirectSwapViewProps> = (props) => {
   const [isInsufficientFunds, setIsInsufficientFunds] = useState(false);
 
   useEffect(() => {
-    account &&
-      localTokenIn &&
+    if (account && localTokenIn)
       setIsInsufficientFunds(
         Number(formatTokenAmount(localTokenIn, tokenInBalance)) <
           Number(localInAmount)
       );
-  }, [tokenInBalance, localInAmount, localTokenIn, account]);
+  }, [tokenInBalance, localInAmount, localTokenIn, account, localTokenOut]);
 
   useEffect(() => {
     getTokens([chainId ?? defaultChainId]);
@@ -154,7 +153,7 @@ const DirectSwapView: React.FC<DirectSwapViewProps> = (props) => {
   };
 
   const handleErrorMessage = useCallback(() => {
-    if (!notificationId) {
+    if (!notificationId && isInsufficientFunds) {
       setSwapErrorMessage(insufficientFundsError);
       const id = nanoid();
       setNotificationId(id);
@@ -165,7 +164,7 @@ const DirectSwapView: React.FC<DirectSwapViewProps> = (props) => {
         id: id,
       });
     }
-  }, [addNotification, notificationId]);
+  }, [addNotification, isInsufficientFunds, notificationId]);
 
   const handleRemoveErrorMessage = useCallback(() => {
     if (notificationId) {

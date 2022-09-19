@@ -22,15 +22,15 @@ export const useGaSwapEvents = () => {
   const setTxnContext = useCallback(() => {
     return {
       crypto: {
-        inToken: tokenIn.symbol,
-        outToken: tokenOut.symbol,
+        inToken: tokenIn?.symbol,
+        outToken: tokenOut?.symbol,
         dex: "lifi",
       },
       location: {
         country,
       },
     };
-  }, [country, tokenIn.symbol, tokenOut.symbol]);
+  }, [country, tokenIn?.symbol, tokenOut?.symbol]);
 
   const triggerWalletConnectEvent = useCallback(() => {
     const event: GtmEvent = {

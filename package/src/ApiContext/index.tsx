@@ -158,7 +158,6 @@ const APIProvider: React.FC<APIProviderType> = (props) => {
 
   const getCountry = useCallback(async () => {
     const country = await API.getCountry();
-    console.log(country);
     addData({ country });
   }, [addData]);
 
