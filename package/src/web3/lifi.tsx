@@ -6,7 +6,6 @@ import LIFI, {
 } from "@lifinance/sdk";
 import { utils } from "ethers";
 
-// if ?prod=true
 const isProd = (): boolean => {
   return process.env.STAGE === "prod";
 };
@@ -31,6 +30,16 @@ export const supportedChains = [
     coin: "ETH",
     id: 4,
   },
+  {
+    name: "Kovan",
+    coin: "ETH",
+    id: 42,
+  },
+  {
+    name: "Goerli",
+    coin: "ETH",
+    id: 5,
+  },
 ];
 
 export const lifi = new LIFI(lifiConfig);
@@ -38,14 +47,17 @@ export const lifi = new LIFI(lifiConfig);
 export const getLifiQuote = async (
   tokenIn: Token,
   tokenOut: Token,
-  inputAmount: number, // not formatted
+  inputAmount: number,
   userAccount: string,
   destinationAddress?: string,
   signal?: AbortSignal,
   slippage: number = 0.05
 ) => {
   const formattedAmount = utils
-    .parseUnits(inputAmount.toString(), tokenIn?.decimals)
+    .parseUnits(
+      Number(inputAmount).toFixed(tokenIn?.decimals).toString(),
+      tokenIn?.decimals
+    )
     .toString();
   const request: QuoteRequest = {
     fromChain: tokenIn.chainId,

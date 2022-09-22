@@ -5,13 +5,13 @@ import {
   Ropsten,
   Rinkeby,
   Mainnet,
+  Kovan,
+  Goerli,
 } from "@usedapp/core";
 import React, { createContext, ReactNode, useContext } from "react";
 import { useConnectEnsName, useEnsAvatar } from "./hooks/ens";
 
 const infuraProjectId = "bb5c9b186fcf4139865a530801c160f9";
-
-//TODO: create function to set valid chains and respective urls
 
 export const config: Config = {
   autoConnect: false,
@@ -19,6 +19,8 @@ export const config: Config = {
     [Mainnet.chainId]: `https://mainnet.infura.io/v3/${infuraProjectId}`,
     [Ropsten.chainId]: `https://ropsten.infura.io/v3/${infuraProjectId}`,
     [Rinkeby.chainId]: `https://rinkeby.infura.io/v3/${infuraProjectId}`,
+    [Kovan.chainId]: `https://kovan.infura.io/v3/${infuraProjectId}`,
+    [Goerli.chainId]: `https://goerli.infura.io/v3/${infuraProjectId}`,
   },
   notifications: {
     expirationPeriod: 30000,

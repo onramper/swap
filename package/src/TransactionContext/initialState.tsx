@@ -23,7 +23,7 @@ const initialState: StateType = {
     address: "",
     symbol: "",
     decimals: 6,
-    chainId: 0,
+    chainId: defaultChainId,
     logoURI: "",
   },
   tokens: {},

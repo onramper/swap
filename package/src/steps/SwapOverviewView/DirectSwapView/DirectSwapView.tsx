@@ -40,7 +40,8 @@ import TransactionSettings from "../TransactionSettings/TransactionSettings";
 import { DirectSwapViewProps } from "./DirectSwapView.models";
 import classes from "./DirectSwapView.module.css";
 import { Token } from "../../../web3/lifi";
-import { defaultChainId } from "../../../web3/constants";
+import { defaultChainId, defaultToken } from "../../../web3/constants";
+import FallbackIcon from "../../../icons/default-token.svg";
 
 const insufficientFundsError =
   "You have insufficient funds to complete this transaction";
@@ -73,12 +74,16 @@ const DirectSwapView: React.FC<DirectSwapViewProps> = (props) => {
 
   const ethBalance = useEtherBalance(account) ?? 0;
   let tokenInBalance = useTokenBalance(localTokenIn?.address, account) ?? 0;
-  if (localTokenIn?.symbol === "ETH") tokenInBalance = ethBalance;
+  if (localTokenIn?.symbol === defaultToken) tokenInBalance = ethBalance;
   let tokenOutBalance = useTokenBalance(localTokenOut?.address, account) ?? 0;
-  if (localTokenOut?.symbol === "ETH") tokenOutBalance = ethBalance;
+  if (localTokenOut?.symbol === defaultToken) tokenOutBalance = ethBalance;
 
   const { backScreen, nextScreen } = useNav();
-  const { updateQuote, loading: quoteLoading } = useUpdateQuote();
+  const {
+    updateQuote,
+    loading: quoteLoading,
+    error: isQuoteError,
+  } = useUpdateQuote();
   const { getTokens } = useGetTokens();
   const { executeTransaction, loading: transactionLoading } =
     useExecuteTransaction();
@@ -92,13 +97,12 @@ const DirectSwapView: React.FC<DirectSwapViewProps> = (props) => {
   const [isInsufficientFunds, setIsInsufficientFunds] = useState(false);
 
   useEffect(() => {
-    account &&
-      localTokenIn &&
+    if (account && localTokenIn)
       setIsInsufficientFunds(
         Number(formatTokenAmount(localTokenIn, tokenInBalance)) <
           Number(localInAmount)
       );
-  }, [tokenInBalance, localInAmount, localTokenIn, account]);
+  }, [tokenInBalance, localInAmount, localTokenIn, account, localTokenOut]);
 
   useEffect(() => {
     getTokens([chainId ?? defaultChainId]);
@@ -107,6 +111,7 @@ const DirectSwapView: React.FC<DirectSwapViewProps> = (props) => {
   useEffect(() => {
     if (tokens) {
       setLocalTokenIn(tokens[chainId ?? defaultChainId]?.[0]);
+      setLocalTokenOut(null);
       setInTokens(tokens[chainId ?? defaultChainId]);
       setOutTokens(tokens[chainId ?? defaultChainId]);
     }
@@ -117,17 +122,16 @@ const DirectSwapView: React.FC<DirectSwapViewProps> = (props) => {
       updateInAmount(Number(localInAmount));
       updateTokenIn(localTokenIn);
       updateTokenOut(localTokenOut);
-      debouncedUpdateQuote(
-        Number(localInAmount),
-        localTokenIn,
-        localTokenOut,
-        beforeUnLoadRef.current.signal
-      );
+      if (localTokenIn && localTokenOut)
+        debouncedUpdateQuote(
+          Number(localInAmount),
+          localTokenIn,
+          localTokenOut,
+          beforeUnLoadRef.current.signal
+        );
     }
   }, [
     debouncedUpdateQuote,
-    getTokens,
-    isInsufficientFunds,
     localInAmount,
     localTokenIn,
     localTokenOut,
@@ -135,7 +139,6 @@ const DirectSwapView: React.FC<DirectSwapViewProps> = (props) => {
     updateTokenIn,
     updateTokenOut,
     slippageTolerance,
-    isSupportedNetwork,
   ]);
 
   const onMaxClick = useCallback(async () => {
@@ -150,7 +153,7 @@ const DirectSwapView: React.FC<DirectSwapViewProps> = (props) => {
   };
 
   const handleErrorMessage = useCallback(() => {
-    if (!notificationId) {
+    if (!notificationId && isInsufficientFunds) {
       setSwapErrorMessage(insufficientFundsError);
       const id = nanoid();
       setNotificationId(id);
@@ -161,7 +164,7 @@ const DirectSwapView: React.FC<DirectSwapViewProps> = (props) => {
         id: id,
       });
     }
-  }, [addNotification, notificationId]);
+  }, [addNotification, isInsufficientFunds, notificationId]);
 
   const handleRemoveErrorMessage = useCallback(() => {
     if (notificationId) {
@@ -171,7 +174,7 @@ const DirectSwapView: React.FC<DirectSwapViewProps> = (props) => {
   }, [notificationId, removeNotification]);
 
   useEffect(() => {
-    if (isSupportedNetwork && isInsufficientFunds) {
+    if (isSupportedNetwork || isInsufficientFunds) {
       handleErrorMessage();
     } else {
       handleRemoveErrorMessage();
@@ -202,7 +205,6 @@ const DirectSwapView: React.FC<DirectSwapViewProps> = (props) => {
 
   const handleItemClick = useCallback(
     (name: string, index: number, item: ItemType) => {
-      console.log(item);
       if (name === "inTokens") setLocalTokenIn(item);
       else setLocalTokenOut(item);
       backScreen();
@@ -217,7 +219,7 @@ const DirectSwapView: React.FC<DirectSwapViewProps> = (props) => {
           name="inTokens"
           title={"Select a token"}
           indexSelected={inTokens.findIndex(
-            (t: Token) => t.name === tokenIn?.name
+            (t: Token) => t.name === localTokenIn?.name
           )}
           items={inTokens.map((t) => {
             return {
@@ -226,6 +228,7 @@ const DirectSwapView: React.FC<DirectSwapViewProps> = (props) => {
               name: t.name,
               icon: t.logoURI,
               info: t.symbol,
+              fallbackIcon: FallbackIcon,
             };
           })}
           onItemClick={handleItemClick}
@@ -233,7 +236,7 @@ const DirectSwapView: React.FC<DirectSwapViewProps> = (props) => {
         />
       );
     }
-  }, [inTokens, nextScreen, handleItemClick, tokenIn?.name]);
+  }, [inTokens, localTokenIn?.name, nextScreen, handleItemClick]);
 
   const openOutTokens = useCallback(() => {
     if (outTokens.length > 1) {
@@ -242,7 +245,7 @@ const DirectSwapView: React.FC<DirectSwapViewProps> = (props) => {
           name="outTokens"
           title={"Select a token"}
           indexSelected={outTokens.findIndex(
-            (t: Token) => t.name === tokenOut?.name
+            (t: Token) => t.symbol === localTokenOut?.name
           )}
           items={outTokens.map((t) => {
             return {
@@ -251,6 +254,7 @@ const DirectSwapView: React.FC<DirectSwapViewProps> = (props) => {
               name: t.name,
               icon: t.logoURI,
               info: t.symbol,
+              fallbackIcon: FallbackIcon,
             };
           })}
           onItemClick={handleItemClick}
@@ -258,7 +262,7 @@ const DirectSwapView: React.FC<DirectSwapViewProps> = (props) => {
         />
       );
     }
-  }, [outTokens, nextScreen, handleItemClick, tokenOut?.name]);
+  }, [outTokens, nextScreen, handleItemClick, localTokenOut?.name]);
 
   const handleDropdown = useCallback(
     (item?: any, type?: "in" | "out") => {
@@ -278,7 +282,10 @@ const DirectSwapView: React.FC<DirectSwapViewProps> = (props) => {
       transactionLoading ||
       quoteLoading ||
       isInsufficientFunds ||
-      !isSupportedNetwork
+      !isSupportedNetwork ||
+      !tokenOut ||
+      !tokenIn ||
+      isQuoteError
     );
   };
   return (
@@ -312,12 +319,12 @@ const DirectSwapView: React.FC<DirectSwapViewProps> = (props) => {
           suffix={`($${quote?.fromAmountUSD ?? "0.00"})`}
           handleProps={{
             icon: localTokenIn?.logoURI,
+            fallbackIcon: FallbackIcon,
             value: localTokenIn ? localTokenIn.symbol : "Select a token",
             disabled: false,
             onClick: () => handleDropdown(localTokenIn, "in"),
           }}
           markedError={!!swapErrorMessage}
-          readonly={!localTokenOut}
         />
 
         <InputDropdown
@@ -334,7 +341,8 @@ const DirectSwapView: React.FC<DirectSwapViewProps> = (props) => {
           }`}
           suffix={`($${quote?.toAmountUSD ?? "0.00"})`}
           handleProps={{
-            icon: localTokenOut?.logoURI,
+            icon: localTokenOut?.logoURI ?? FallbackIcon,
+            fallbackIcon: FallbackIcon,
             value: localTokenOut ? localTokenOut.symbol : "Select a token",
             disabled: false,
             onClick: () => handleDropdown(localTokenOut, "out"),

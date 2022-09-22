@@ -70,6 +70,7 @@ const ViewList: React.FC<ViewListProps> = (props: ViewListProps) => {
                 icon={item.icon}
                 iconSvg={item.iconSvg}
                 network={item.network}
+                fallbackIcon={item.fallbackIcon}
                 onClick={() => handleItemClick(i, item)}
                 isSelected={indexSelected === i}
                 rightSection={item.rightSection}
