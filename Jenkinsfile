@@ -32,20 +32,27 @@ pipeline {
 
         stage('TF - Init') {  
             steps {
-                sh 'pwd; cd terraform; terraform init -input=false'       
+                script {
+                    if (branch_nem == 'dev') {
+                        sh 'pwd; cd terraform_dev; terraform init -input=false'  
+                    } else {
+                        sh "echo 'Wrong Branch!!'"
+                    }
+                }
+     
             }
         }
 
         stage('TF - Plan') {
             steps {
-                sh 'cd terraform; terraform workspace select ${environment} || terraform workspace new ${environment} '
-                sh 'cd terraform; terraform plan -input=false -out tfplan'
-                sh 'cd terraform; terraform show -no-color tfplan > tfplan.txt'
+                sh 'cd terraform_dev; terraform workspace select ${environment} || terraform workspace new ${environment} '
+                sh 'cd terraform_dev; terraform plan -input=false -out tfplan'
+                sh 'cd terraform_dev; terraform show -no-color tfplan > tfplan.txt'
                 }
         }
         stage('Deploy - Dev') {
             steps {
-                sh 'pwd;cd terraform ; terraform apply -input=false  tfplan'    
+                sh 'pwd;cd terraform_dev ; terraform apply -input=false  tfplan'    
             }
         }
     }
