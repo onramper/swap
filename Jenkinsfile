@@ -32,7 +32,7 @@ pipeline {
         stage('TF - Init') {  
             steps {
                 script {
-                    if (${branch_nem} == 'dev') {
+                    if (env.BRANCH_NAME == 'dev') {
                         sh 'pwd; cd terraform_dev; terraform init -input=false'  
                     } else {
                         sh "echo 'Wrong Branch!!'"
