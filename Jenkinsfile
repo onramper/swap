@@ -17,6 +17,13 @@ pipeline {
             steps{
                 sh 'ls -al'
                 sh 'echo env.GIT_BRANCH'
+                script {
+                    def branch_nem = scm.branches[0].name
+                    if (branch_nem.contains("*/")) {
+                    branch_nem = branch_nem.split("\\*/")[1]
+                    }
+                    echo branch_nem
+                }
                 //sh 'cd package && npm ci --omit peer --loglevel verbose &&  npm run build:dev --loglevel verbose'
                 //sh 'cd iframe && npm install --loglevel verbose && npm ci --loglevel verbose && npm run build:dev --loglevel verbose'
                 sh 'ls -al iframe/build/'
