@@ -16,7 +16,6 @@ pipeline {
         stage('Build') {
             steps{
                 sh 'ls -al'
-                sh 'echo env.GIT_BRANCH'
                 script {
                     def branch_nem = scm.branches[0].name
                     if (branch_nem.contains("*/")) {
@@ -33,7 +32,7 @@ pipeline {
         stage('TF - Init') {  
             steps {
                 script {
-                    if (branch_nem == 'dev') {
+                    if (${branch_nem} == 'dev') {
                         sh 'pwd; cd terraform_dev; terraform init -input=false'  
                     } else {
                         sh "echo 'Wrong Branch!!'"
