@@ -20,8 +20,8 @@ pipeline {
                 sh "echo '${branch}'"
                 sh "echo '${env.WORKSPACE}'"
 
-                //sh 'cd package && npm ci --omit peer --loglevel verbose &&  npm run build:dev --loglevel verbose'
-                //sh 'cd iframe && npm install --loglevel verbose && npm ci --loglevel verbose && npm run build:dev --loglevel verbose'
+                sh 'cd package && npm ci --omit peer --loglevel verbose &&  npm run build:dev --loglevel verbose'
+                sh 'cd iframe && npm install --loglevel verbose && npm ci --loglevel verbose && npm run build:dev --loglevel verbose'
                 sh 'ls -al iframe/build/'
             }   
         }
