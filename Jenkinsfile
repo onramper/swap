@@ -16,7 +16,7 @@ pipeline {
         stage('Build') {
             steps{
                 sh 'ls -al'
-                sh "echo env.BRANCH_NAME"
+                sh "echo ${env.BRANCH_NAME}"
                 script {
                     def branch_nem = scm.branches[0].name
                     if (branch_nem.contains("*/")) {
