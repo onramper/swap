@@ -10,7 +10,7 @@ variable "website_root" {
 
 locals {
   website_files = fileset(var.website_root, "**")
-  mime_types = jsondecode(file("/var/lib/jenkins/jobs/Swap/jobs/Swap-pre-production/workspace/terraform_dev//mime.json"))
+  mime_types = jsondecode(file("${path.module}/mime.json"))
 }
 
 resource "aws_s3_bucket" "onramper-swap-dev" {
