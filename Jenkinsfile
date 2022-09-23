@@ -29,6 +29,9 @@ pipeline {
                 script {
                     if (branch == 'dev') {
                         sh 'pwd; cd terraform_dev; terraform init -input=false'  
+                    }
+                    if (branch == 'master'){
+                        sh 'pwd; cd terraform_prod; terraform init -input=false'
                     } else {
                         sh "echo 'Wrong Branch!!'"
                     }
@@ -44,6 +47,11 @@ pipeline {
 				        sh 'cd terraform_dev; terraform workspace select ${environment} || terraform workspace new ${environment} '
                         sh 'cd terraform_dev; terraform plan -input=false -out tfplan'
                         sh 'cd terraform_dev; terraform show -no-color tfplan > tfplan.txt'
+                    } 
+                    if (branch == 'master') {
+				        sh 'cd terraform_prod; terraform workspace select ${environment} || terraform workspace new ${environment} '
+                        sh 'cd terraform_prod; terraform plan -input=false -out tfplan'
+                        sh 'cd terraform_prod; terraform show -no-color tfplan > tfplan.txt'
                     } else {
                         sh "echo 'Wrong Branch!!'"
                     }
@@ -55,6 +63,9 @@ pipeline {
                 script {
                     if (branch == 'dev') {
 				        sh 'pwd;cd terraform_dev ; terraform apply -input=false  tfplan'  
+                    } 
+                    if (branch == 'master') {
+                        sh 'pwd;cd terraform_prod ; terraform apply -input=false  tfplan'
                     } else {
                         sh "echo 'Wrong Branch!!'"
                     }
