@@ -2,9 +2,11 @@ import React from "react";
 import styles from "./DropdownHandle.module.css";
 import arrowDownIcon from "./../../icons/arrow-down.svg";
 import { DropdownHandleProps } from "./DropdownHandle.models";
+import { ImageWithFallback } from "../ImageWithFallback/ImageWithFallback";
 
 const DropdownHandle: React.FC<DropdownHandleProps> = ({
   icon,
+  fallbackIcon,
   value,
   className,
   iconClassname,
@@ -21,13 +23,12 @@ const DropdownHandle: React.FC<DropdownHandleProps> = ({
       <div
         className={`${styles["icon-handle-wrapper"]} ${iconClassname || ""}`}
       >
-        {icon && (
-          <img
-            className={styles["icon-handle"]}
-            src={icon}
-            alt="icon-dropdown"
-          />
-        )}
+        <ImageWithFallback
+          alt="icon-dropdown"
+          className={styles["icon-handle"]}
+          src={icon ?? fallbackIcon}
+          fallbackSrc={fallbackIcon}
+        />
       </div>
 
       <span className={styles["value-dropdown"]}>{value}</span>

@@ -1,15 +1,8 @@
 import "abort-controller/polyfill";
-import { GatewayRate, RateResponse } from "./types/rate";
-import {
-  Currency,
-  GatewaysResponse,
-  GatewayStaticRoutingResponse,
-} from "./types/gateways";
+import { GatewaysResponse } from "./types/gateways";
 import { FieldError } from "./types/nextStep";
 import { NextStep } from "..";
-import processMoonpayStep, { moonpayUrlRegex } from "@onramper/moonpay-adapter";
 import { BrowserClient, Hub } from "@sentry/browser";
-import type { CryptoAddrType } from "../initialState";
 import i18next from "i18next";
 import i18n from "../../i18n/config";
 import { BASE_API } from "./constants";
@@ -86,37 +79,6 @@ const gateways = async (params: GatewaysParams): Promise<GatewaysResponse> => {
   return gateways;
 };
 
-interface RateParams {
-  country?: string;
-  amountInCrypto?: boolean;
-  address?: string;
-  addressTag?: string;
-  gateway?: string;
-  includeIcons?: boolean;
-  minAmountEur?: number;
-}
-
-const rate = async (
-  currency: string,
-  crypto: string,
-  amount: number,
-  paymentMethod: string,
-  params?: RateParams,
-  signal?: AbortSignal
-): Promise<RateResponse> => {
-  const urlParams = createUrlParamsFromObject(params ?? {});
-  const ratesUrl = `${BASE_API}/v2/rate/${currency}/${crypto}/${paymentMethod}/${amount}?${urlParams}`;
-
-  logRequest(ratesUrl);
-  const ratesRes = await fetch(ratesUrl, {
-    headers,
-    signal,
-    credentials: process.env.STAGE === "local" ? "omit" : "include",
-  });
-  const rates: RateResponse = await processResponse(ratesRes);
-  return rates;
-};
-
 /**
  * Exectue step
  */
@@ -153,7 +115,7 @@ const executeStep = async (
   if (step.url === undefined)
     throw new Error("Unexpected error: Invalid step end.");
 
-  const isMoonpay = isMoonpayStep(step.url);
+  const isMoonpay = false; //isMoonpayStep(step.url);
   const isFile = step.type === "file";
   const isMoonpayFile = isFile && isMoonpay;
   const method = isMoonpayFile ? "PUT" : "POST";
@@ -165,26 +127,26 @@ const executeStep = async (
   const urlParams = createUrlParamsFromObject(params ?? {});
 
   logRequest(step.url);
-  const nextStepType = step.url.split("/")[5];
-  let nextStep: FetchResponse;
-  if (isMoonpay && nextStepType !== "redirect") {
-    nextStep = await processMoonpayStep(step.url, { method, headers, body });
-  } else {
-    nextStep = await fetch(`${step.url}?${urlParams}`, {
-      method,
-      headers,
-      body,
-    });
-  }
+  // const nextStepType = step.url.split("/")[5];
+  // let nextStep: FetchResponse;
+  // if (isMoonpay && nextStepType !== "redirect") {
+  // nextStep = await processMoonpayStep(step.url, { method, headers, body });
+  // } else {
+  const nextStep = await fetch(`${step.url}?${urlParams}`, {
+    method,
+    headers,
+    body,
+  });
+  // }
   return processResponse(nextStep);
 };
 
-const isMoonpayStep = (stepUrl: string) => {
-  if (process.env.STAGE === "demo")
-    //only for demo purposes
-    return false;
-  return moonpayUrlRegex.test(stepUrl);
-};
+// const isMoonpayStep = (stepUrl: string) => {
+//   if (process.env.STAGE === "demo")
+//     //only for demo purposes
+//     return false;
+//   return moonpayUrlRegex.test(stepUrl);
+// };
 
 /**
  * Utils
@@ -294,153 +256,6 @@ export interface Filters {
   onlyGateways?: string[];
   onlyFiat?: string[];
 }
-const filterGatewaysResponse = (
-  gatewaysResponse: GatewaysResponse,
-  filters?: Filters
-): GatewaysResponse => {
-  if (!filters) return gatewaysResponse;
-
-  const {
-    onlyCryptos,
-    excludeCryptos,
-    onlyPaymentMethods,
-    excludePaymentMethods,
-    excludeFiat,
-    onlyGateways,
-    onlyFiat,
-  } = filters;
-
-  const _onlyCryptos = onlyCryptos?.map((id) => id.toUpperCase());
-  const _excludeCryptos = excludeCryptos?.map((id) => id.toUpperCase());
-
-  const _onlyPaymentMethods = onlyPaymentMethods;
-  const _excludePaymentMethods = excludePaymentMethods;
-
-  const _onlyFiat = onlyFiat?.map((code) => code.toUpperCase());
-  const _excludeFiat = excludeFiat?.map((code) => code.toUpperCase());
-
-  const filtredGateways = gatewaysResponse.gateways
-    .map((gateway) => {
-      let cryptosList = gateway.cryptoCurrencies;
-      let paymentMethodsList = gateway.paymentMethods;
-      let fiatList = gateway.fiatCurrencies;
-
-      if (_onlyCryptos && _onlyCryptos?.length > 0)
-        cryptosList = cryptosList.filter((crypto) =>
-          _onlyCryptos.includes(crypto.id)
-        );
-      if (_excludeCryptos && _excludeCryptos?.length > 0)
-        cryptosList = cryptosList.filter(
-          (crypto) => !_excludeCryptos.includes(crypto.id)
-        );
-
-      if (_onlyPaymentMethods && _onlyPaymentMethods?.length > 0)
-        paymentMethodsList = paymentMethodsList.filter((paymentMethod) =>
-          _onlyPaymentMethods.includes(paymentMethod)
-        );
-      if (_excludePaymentMethods && _excludePaymentMethods?.length > 0)
-        paymentMethodsList = paymentMethodsList.filter(
-          (paymentMethod) => !_excludePaymentMethods.includes(paymentMethod)
-        );
-
-      if (_onlyFiat && _onlyFiat?.length > 0)
-        fiatList = fiatList.filter((fiat) => _onlyFiat.includes(fiat.code));
-      if (_excludeFiat && _excludeFiat?.length > 0)
-        fiatList = fiatList.filter((fiat) => !_excludeFiat.includes(fiat.code));
-
-      return {
-        ...gateway,
-        cryptoCurrencies: cryptosList,
-        paymentMethods: paymentMethodsList,
-        fiatCurrencies: fiatList,
-      };
-    })
-    .filter((gateway) => {
-      if (onlyGateways === undefined) {
-        return true;
-      }
-      return onlyGateways.includes(gateway.identifier);
-    });
-  return {
-    ...gatewaysResponse,
-    gateways: filtredGateways,
-  };
-};
-
-const sortCryptoByRecommended = (
-  availableCryptos: Currency[],
-  recommendedCryptoCurrencies?: string[]
-): Currency[] => {
-  if (!recommendedCryptoCurrencies) return availableCryptos;
-
-  return availableCryptos.sort((c1: Currency, c2: Currency) => {
-    const c1Index = recommendedCryptoCurrencies.indexOf(c1.id);
-    const c2Index = recommendedCryptoCurrencies.indexOf(c2.id);
-
-    if (c1Index === c2Index) return 0;
-    if (c2Index === -1) return -1;
-    if (c1Index === -1) return 1;
-    return c1Index < c2Index ? -1 : 1;
-  });
-};
-
-type DefaultAddrs = {
-  [denom: string]: CryptoAddrType | undefined;
-};
-
-const filterRatesResponse = (
-  ratesResponse: RateResponse,
-  onlyGateways?: string[],
-  defaultAddrs?: DefaultAddrs,
-  selectedCrypto?: string
-): RateResponse => {
-  return ratesResponse.filter((gateway) => {
-    if (
-      onlyGateways !== undefined &&
-      !onlyGateways.includes(gateway.identifier)
-    ) {
-      return false;
-    }
-    if (defaultAddrs !== undefined && selectedCrypto !== undefined) {
-      const memoUsed = defaultAddrs[selectedCrypto]?.memo !== undefined;
-      if (memoUsed) {
-        const nextStep = gateway.nextStep;
-        if (
-          nextStep !== undefined &&
-          nextStep.type === "form" &&
-          !nextStep.data.some(
-            (data) => data.name === "cryptocurrencyAddressTag"
-          )
-        ) {
-          return false;
-        }
-      }
-    }
-    return true;
-  });
-};
-
-interface SellParams {
-  country?: string;
-  amountInCrypto?: boolean;
-}
-
-const sell = async (
-  crypto: string,
-  amount: number,
-  paymentMethod: string,
-  params?: SellParams
-): Promise<GatewayRate> => {
-  const urlParams = createUrlParamsFromObject(params ?? {});
-  const ratesUrl = `${BASE_API}/sell/${crypto}/${paymentMethod}/${amount}?${urlParams}`;
-  logRequest(ratesUrl);
-  const ratesRes = await fetch(ratesUrl, {
-    headers,
-    credentials: process.env.STAGE === "local" ? "omit" : "include",
-  });
-  const rates: GatewayRate = await processResponse(ratesRes);
-  return rates;
-};
 
 const pollTransaction = async (
   txId: string
@@ -469,54 +284,35 @@ function formatData(data: RawData): TransactionData {
   };
 }
 
+async function getCountry() {
+  const res = await fetch(`https://ipapi.co/json/`, {
+    method: "GET",
+  });
+
+  const geoData = await res.json();
+  return geoData.country;
+}
+
 function storeTransactionData(data: RawData) {
   if (data.address && data.txData) {
-    // const formattedData = formatData(data);
     if (!isTransactionHash(data.txHash)) {
       throw new Error("Invalid transaction hash");
     }
     console.log(JSON.stringify(data));
-    // return fetch(`${BASE_API}/v2/storeTxHash`, {
-    //   method: "POST",
-    //   headers,
-    //   body: JSON.stringify(formattedData),
-    // });
-
-    // return fetch(
-    //   `https://b8a7wseq3k.execute-api.us-east-1.amazonaws.com/dev/swap-dev`,
-    //   {
-    //     method: "POST",
-    //     headers,
-    //     body: JSON.stringify(data),
-    //   }
-    // );
+    return fetch(`https://ppe.onramper.tech/swap-dev`, {
+      method: "POST",
+      headers,
+      body: JSON.stringify(data),
+    });
   }
 }
-
-const getGatewayStaticRouting = async (country?: string) => {
-  const url = `${BASE_API}/routing/${country}`;
-  logRequest(url);
-  const response = await fetch(url, {
-    headers,
-    credentials: process.env.STAGE === "local" ? "omit" : "include",
-  });
-
-  const data: GatewayStaticRoutingResponse = await processResponse(response);
-  return data;
-};
 
 export {
   authenticate,
   gateways,
-  rate,
   executeStep,
-  filterGatewaysResponse,
-  sortCryptoByRecommended,
-  filterRatesResponse,
   getAcceptLanguageParameter,
   updateAcceptLanguageParameter,
-  sell,
-  getGatewayStaticRouting,
   NextStepError,
   sentryHub,
   ApiError,
@@ -526,4 +322,5 @@ export {
   isNextStepError,
   formatData,
   storeTransactionData,
+  getCountry,
 };

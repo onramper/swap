@@ -2,13 +2,10 @@ import { NextStep, APIContext } from "../../ApiContext";
 import React, { useState, useEffect, useContext } from "react";
 import { NavContext } from "../../NavContext";
 import { StepType } from "../../ApiContext/api/types/nextStep";
-import FormView from "../FormView";
 import UploadView from "../UploadView";
 import PaymentReview from "../PaymentReviewView";
 import PickOptionView from "../PickOptionView";
 import SuccessView from "../SuccessView";
-import IframeView from "../IframeView";
-import WireTranserView from "../WireTranserView";
 import WaitView from "../WaitView";
 import InformationView from "../InformationView";
 import EmailVerificationView from "../EmailVerificationView/EmailVerificationView";
@@ -27,17 +24,11 @@ export const useStepResolutionCall = (nextStep?: NextStep) => {
   useEffect(() => {
     setCallback(() => () => {
       switch (nextStep?.type) {
-        case StepType.form:
-          return () => replaceScreen(<FormView nextStep={nextStep} />);
-
         case StepType.file:
           return () => replaceScreen(<UploadView nextStep={nextStep} />);
 
         case StepType.pickOne:
           return () => replaceScreen(<PickOptionView nextStep={nextStep} />);
-
-        case StepType.redirect:
-          return () => replaceScreen(<IframeView nextStep={nextStep} />);
 
         case StepType.popup:
           return () => replaceScreen(<PopupView nextStep={nextStep} />);
@@ -52,12 +43,6 @@ export const useStepResolutionCall = (nextStep?: NextStep) => {
         case StepType.completed:
           return () =>
             replaceScreen(<SuccessView txType="instant" nextStep={nextStep} />);
-
-        case StepType.iframe:
-          return () => replaceScreen(<IframeView nextStep={nextStep} />);
-
-        case StepType.requestBankTransaction:
-          return () => replaceScreen(<WireTranserView nextStep={nextStep} />);
 
         case StepType.information:
           return () => replaceScreen(<InformationView nextStep={nextStep} />);

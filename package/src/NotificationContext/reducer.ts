@@ -10,7 +10,11 @@ export interface RemoveNotification {
   id: string;
 }
 
-type Action = AddNotification | RemoveNotification;
+export interface RemoveAllNotifications {
+  type: "REMOVE_ALL_NOTIFICATIONS";
+}
+
+type Action = AddNotification | RemoveNotification | RemoveAllNotifications;
 
 export function notificationReducer(
   state: Notifications,
@@ -22,6 +26,9 @@ export function notificationReducer(
 
     case "REMOVE_NOTIFICATION":
       return state.filter((n) => n.id !== action.id);
+
+    case "REMOVE_ALL_NOTIFICATIONS":
+      return (state = []);
 
     default:
       return state;

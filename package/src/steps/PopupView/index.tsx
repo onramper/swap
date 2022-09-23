@@ -37,8 +37,6 @@ const PopupView: React.FC<{
   useEffect(() => {
     const receiveMessage = async (event: MessageEvent) => {
       console.log("Received new event", event);
-      console.log(event.origin);
-
       sentryHub.addBreadcrumb({
         message: `Received a postMessage from ${event.origin}`,
         data: event.data,

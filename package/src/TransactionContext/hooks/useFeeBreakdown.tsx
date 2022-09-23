@@ -1,4 +1,4 @@
-import { formatUnits } from "ethers/lib/utils";
+import { formatUnits, parseUnits } from "ethers/lib/utils";
 import { useCallback, useEffect, useState } from "react";
 import { formatTokenAmount } from "../../utils";
 import { useTransactionContext } from "./useTransactionContext";
@@ -88,13 +88,13 @@ export const useFeeBreakdown = () => {
   });
 
   const calculateFees = useCallback(() => {
-    const formattedInAmount = quote
-      ? formatTokenAmount(tokenIn, quote.fromAmount)
-      : "0.00";
+    const formattedInAmount =
+      tokenIn && quote ? formatTokenAmount(tokenIn, quote.fromAmount) : "0.00";
 
-    const formattedOutputAmountAfterFees = quote
-      ? formatTokenAmount(tokenOut, quote.toAmountMin)
-      : "0.00";
+    const formattedOutputAmountAfterFees =
+      tokenOut && quote
+        ? formatTokenAmount(tokenOut, quote.toAmountMin)
+        : "0.00";
 
     const totalGasCost = gasCosts
       ?.map((cost) => formatUnits(cost.amount, "gwei"))
@@ -106,7 +106,10 @@ export const useFeeBreakdown = () => {
       feeCosts?.map((fee) => {
         return {
           label: fee.name,
-          amount: formatTokenAmount(fee.token, fee.amount),
+          amount: parseUnits(
+            Number(fee.amount).toFixed(fee.token.decimals).toString(),
+            fee.token.decimals
+          ).toString(), //formatTokenAmount(fee.token, fee.amount),
         };
       });
 

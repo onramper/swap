@@ -1,7 +1,7 @@
 import { useSendTransaction } from "@usedapp/core";
-import { lifiChains } from "layer2";
 import { nanoid } from "nanoid";
 import React, { useCallback, useEffect, useRef, useState } from "react";
+import { useGaSwapEvents } from "../../hooks/gtm/useGaSwapEvents";
 import { useNav } from "../../NavContext";
 import {
   NotificationType,
@@ -10,7 +10,7 @@ import {
 import OrderCompleteView from "../../steps/OrderCompleteView/OrderCompleteView";
 import TransactionErrorOverlay from "../../steps/SwapOverviewView/TransactionErrorOverlay/TransactionErrorOverlay";
 import { useLayer2 } from "../../web3/config";
-import { getLifiQuote } from "../../web3/lifi";
+import { getLifiQuote, supportedChains } from "../../web3/lifi";
 import { useTransactionContext } from "./useTransactionContext";
 
 export const useExecuteTransaction = () => {
@@ -21,15 +21,14 @@ export const useExecuteTransaction = () => {
     tokenOut,
     transactionRequest,
     selectedWalletAddress,
-    txId,
     slippageTolerance,
   } = useTransactionContext();
   const { addNotification, removeNotification } = useWidgetNotifications();
-  // const balance = useEtherBalance(account);
   const [loading, setLoading] = useState<boolean>(false);
-  const { sendTransaction, state } = useSendTransaction();
+  const { sendTransaction, state, resetState } = useSendTransaction();
   const { nextScreen } = useNav();
   const beforeUnLoadRef = useRef<AbortController>(new AbortController());
+  const { triggerSwapStartEvent, triggerConfirmSwapEvent } = useGaSwapEvents();
 
   const executeTransaction = useCallback(async () => {
     const destinationAddress = selectedWalletAddress ?? account;
@@ -42,8 +41,8 @@ export const useExecuteTransaction = () => {
       return;
     }
     if (chainId !== tokenIn.chainId) {
-      const tokenInChainName = lifiChains.find(
-        (c) => c.chainId === tokenIn.chainId
+      const tokenInChainName = supportedChains.find(
+        (c) => c.id === tokenIn.chainId
       )?.name;
       if (!tokenInChainName) {
         addNotification({
@@ -71,6 +70,7 @@ export const useExecuteTransaction = () => {
           shouldExpire: false,
           id,
         });
+        triggerSwapStartEvent();
         await sendTransaction({
           data: transactionRequest.data,
           from: selectedWalletAddress ?? account,
@@ -99,6 +99,7 @@ export const useExecuteTransaction = () => {
         );
 
         if (res?.transactionRequest) {
+          triggerSwapStartEvent();
           addNotification({
             type: NotificationType.Info,
             message: "Please sign transaction",
@@ -149,12 +150,12 @@ export const useExecuteTransaction = () => {
     tokenIn,
     tokenOut,
     transactionRequest,
+    triggerSwapStartEvent,
   ]);
 
   const handleException = useCallback(
     (status, errorMessage) => {
       if (errorMessage) {
-        //status === "Exception"
         if (errorMessage?.includes("INSUFFICIENT_OUTPUT_AMOUNT")) {
           nextScreen(
             <TransactionErrorOverlay
@@ -209,24 +210,27 @@ export const useExecuteTransaction = () => {
           );
         }
       }
+      resetState();
     },
-    [nextScreen]
+    [nextScreen, resetState]
   );
 
   const handleMining = useCallback(async () => {
     if (state.transaction && account) {
-      console.log(state.transaction);
+      // console.log(state.transaction);
       try {
         // storeTransactionData({
         //   address: account,
         //   fromAmount: inAmount,
         //   toAmount: 0,
+        //   fromChain: 3,
+        //   toChain: 3,
         //   txHash: state.transaction.hash,
         //   fromCurrency: tokenIn.symbol,
         //   toCurrency: tokenOut.symbol,
         //   status: "pending",
-        //   bridge: "",
-        //   country: "",
+        //   bridge: "hop",
+        //   country: "LK",
         //   partnerKey: "",
         //   txData: state.transaction,
         // });
@@ -245,6 +249,7 @@ export const useExecuteTransaction = () => {
 
   useEffect(() => {
     if (state.status === "Mining") {
+      triggerConfirmSwapEvent();
       handleMining();
     }
     if (state.status === "Exception") {
@@ -252,14 +257,11 @@ export const useExecuteTransaction = () => {
     }
   }, [
     handleException,
-    account,
-    nextScreen,
-    txId,
     state.errorMessage,
     state.errorCode,
-    tokenOut,
     handleMining,
     state.status,
+    triggerConfirmSwapEvent,
   ]);
 
   useEffect(() => {

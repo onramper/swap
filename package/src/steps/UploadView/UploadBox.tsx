@@ -4,7 +4,6 @@ import styles from "./styles.module.css";
 import IconUpload from "../../icons/upload_file.svg";
 import IconDocument from "../../icons/file.svg";
 import IconDelete from "../../icons/delete.svg";
-import { acceptedContentTypes } from "@onramper/moonpay-adapter/build/constants";
 
 type UploadBoxType = {
   onFilesAdded: (name: string, files: File[], maxFiles: number) => boolean;
@@ -77,14 +76,14 @@ const UploadBox: React.FC<UploadBoxType> = (props) => {
             type="file"
             multiple={maxFiles > 1}
             onChange={handleOnSelectFiles}
-            accept={
-              acceptedContentTypes?.length > 0
-                ? acceptedContentTypes.reduce((acc, act, i) => {
-                    if (i === 0) return act;
-                    return `${acc}, ${act}`;
-                  }, "")
-                : "*"
-            }
+            // accept={
+            //   acceptedContentTypes?.length > 0
+            //     ? acceptedContentTypes.reduce((acc, act, i) => {
+            //         if (i === 0) return act;
+            //         return `${acc}, ${act}`;
+            //       }, "")
+            //     : "*"
+            // }
           />
           <img
             alt="Upload icon"
