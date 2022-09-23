@@ -2,6 +2,7 @@ pipeline {
 
     parameters {
         string(name: 'environment', defaultValue: 'aws', description: 'Workspace for the deployment')
+        string(name: 'branch', defaultValue: 'dev', description: 'branch name')
     }
 
 
@@ -16,7 +17,7 @@ pipeline {
         stage('Build') {
             steps{
                 sh 'ls -al'
-                sh "echo ${env.BRANCH_NAME}"
+                sh "echo 'branch'"
                 script {
                     def branch_nem = scm.branches[0].name
                     if (branch_nem.contains("*/")) {
