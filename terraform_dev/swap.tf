@@ -5,12 +5,12 @@ provider "aws" {
 variable "website_root" {
   type        = string
   description = "Path to the root of website content"
-  default     = "/var/lib/jenkins/jobs/Swap/jobs/Swap-pre-production/workspace/iframe/build"
+  default     = "${env.WORKSPACE}/iframe/build"
 }
 
 locals {
   website_files = fileset(var.website_root, "**")
-  mime_types = jsondecode(file("/var/lib/jenkins/jobs/Swap/jobs/Swap-pre-production/workspace/terraform_dev/mime.json"))
+  mime_types = jsondecode(file("${env.WORKSPACE}/terraform_dev/mime.json"))
 }
 
 resource "aws_s3_bucket" "onramper-swap-dev" {
