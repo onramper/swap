@@ -59,7 +59,8 @@
     "react-router-dom": "^6.3.0",
     "react-transition-group": "^4.4.1",
     "rendered-country-flags": "^1.2.0",
-    "use-debounce": "^7.0.1"
+    "use-debounce": "^7.0.1",
+    "@tanstack/react-virtual": "^3.0.0-beta.18"
   },
   "peerDependencies": {
     "react": "^17.0.2",
