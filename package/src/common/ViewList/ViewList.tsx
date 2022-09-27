@@ -41,6 +41,10 @@ const ViewList: React.FC<ViewListProps> = (props: ViewListProps) => {
     onSearch(query);
   }, [onSearch, query]);
 
+  useEffect(() => {
+    onSearch(query);
+  }, [onSearch, query]);
+
   return (
     <>
       {searchable && (
