@@ -1,14 +1,29 @@
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import styles from "./ViewList.module.css";
 import { ViewListItemType, ViewListProps } from "./ViewList.models";
 import ListItem from "./ViewListItem";
 import SearchInput from "../SearchInput/SearchInput";
+import { useVirtualizer } from "@tanstack/react-virtual";
 
 const determineIsSmallScreen = () =>
   window.screen.height <= 615 || window.screen.width <= 575;
 
 const ViewList: React.FC<ViewListProps> = (props: ViewListProps) => {
-  const { onItemClick = () => null, onSearchBoxClick } = props;
+  const {
+    onItemClick = () => null,
+    onSearchBoxClick,
+    items,
+    searchable,
+    onSearch,
+  } = props;
+
+  const parentRef = React.useRef<HTMLDivElement | null>(null);
+  const { getTotalSize, getVirtualItems } = useVirtualizer({
+    count: items.length,
+    getScrollElement: () => parentRef.current,
+    estimateSize: () => 60,
+    // getItemKey: (index) => items[index].address ?? index,
+  });
 
   const [isSmallHeightScreen] = useState(determineIsSmallScreen());
   const [query, setQuery] = useState("");
@@ -45,9 +60,13 @@ const ViewList: React.FC<ViewListProps> = (props: ViewListProps) => {
     [query]
   );
 
+  useEffect(() => {
+    onSearch(query);
+  }, [onSearch, query]);
+
   return (
     <>
-      {props.searchable && (
+      {searchable && (
         <div className={styles["input-wrapper"]}>
           <SearchInput
             value={query}
@@ -57,27 +76,54 @@ const ViewList: React.FC<ViewListProps> = (props: ViewListProps) => {
           />
         </div>
       )}
-      <ul className={`${styles.list}`}>
-        {props.items.map(
-          (item, i) =>
-            itemIsVisible(item) && (
-              <ListItem
-                id={item.id}
-                key={i}
-                index={i}
-                name={item.name}
-                info={item.info}
-                icon={item.icon}
-                iconSvg={item.iconSvg}
-                network={item.network}
-                fallbackIcon={item.fallbackIcon}
-                onClick={() => handleItemClick(i, item)}
-                isSelected={indexSelected === i}
-                rightSection={item.rightSection}
-              />
-            )
-        )}
-      </ul>
+      <div
+        ref={parentRef}
+        style={{
+          height: `100%`,
+          overflow: "auto",
+        }}
+      >
+        <ul
+          className={`${styles.list}`}
+          style={{
+            height: `${getTotalSize()}px`,
+            width: "100%",
+            position: "relative",
+          }}
+        >
+          {getVirtualItems().map((virtualItem) => {
+            const item = items[virtualItem.index];
+            return (
+              <div
+                key={virtualItem.key}
+                style={{
+                  position: "absolute",
+                  top: 0,
+                  left: 0,
+                  width: "100%",
+                  height: `${virtualItem.size}px`,
+                  transform: `translateY(${virtualItem.start}px)`,
+                }}
+              >
+                <ListItem
+                  id={item.id}
+                  key={virtualItem.key}
+                  index={virtualItem.index}
+                  name={item.name}
+                  info={item.info}
+                  icon={item.icon}
+                  iconSvg={item.iconSvg}
+                  network={item.network}
+                  fallbackIcon={item.fallbackIcon}
+                  onClick={() => handleItemClick(virtualItem.index, item)}
+                  isSelected={indexSelected === virtualItem.index}
+                  rightSection={item.rightSection}
+                />
+              </div>
+            );
+          })}
+        </ul>
+      </div>
     </>
   );
 };
