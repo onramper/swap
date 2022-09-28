@@ -31,6 +31,15 @@ export const useGetTokens = () => {
           return;
         }
         if (res) {
+          if (Object.keys(res.tokens).length === 0) {
+            const id = nanoid();
+            addNotification({
+              type: NotificationType.Error,
+              message: "No tokens available for the selected network",
+              shouldExpire: true,
+              id,
+            });
+          }
           setTokens(res.tokens);
         }
       } catch (error) {
