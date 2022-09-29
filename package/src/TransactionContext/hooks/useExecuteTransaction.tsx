@@ -1,6 +1,8 @@
 import { useSendTransaction } from "@usedapp/core";
 import { nanoid } from "nanoid";
 import React, { useCallback, useEffect, useRef, useState } from "react";
+import { useAPI } from "../../ApiContext";
+import { storeTransactionData } from "../../ApiContext/api";
 import { useGaSwapEvents } from "../../hooks/gtm/useGaSwapEvents";
 import { useNav } from "../../NavContext";
 import {
@@ -9,6 +11,7 @@ import {
 } from "../../NotificationContext";
 import OrderCompleteView from "../../steps/OrderCompleteView/OrderCompleteView";
 import TransactionErrorOverlay from "../../steps/SwapOverviewView/TransactionErrorOverlay/TransactionErrorOverlay";
+import { formatTokenAmount } from "../../utils";
 import { useLayer2 } from "../../web3/config";
 import { getLifiQuote, supportedChains } from "../../web3/lifi";
 import { useTransactionContext } from "./useTransactionContext";
@@ -22,11 +25,15 @@ export const useExecuteTransaction = () => {
     transactionRequest,
     selectedWalletAddress,
     slippageTolerance,
+    quote,
   } = useTransactionContext();
   const { addNotification, removeNotification } = useWidgetNotifications();
   const [loading, setLoading] = useState<boolean>(false);
   const { sendTransaction, state, resetState } = useSendTransaction();
   const { nextScreen } = useNav();
+  const {
+    data: { country },
+  } = useAPI();
   const beforeUnLoadRef = useRef<AbortController>(new AbortController());
   const { triggerSwapStartEvent, triggerConfirmSwapEvent } = useGaSwapEvents();
 
@@ -219,21 +226,21 @@ export const useExecuteTransaction = () => {
     if (state.transaction && account) {
       // console.log(state.transaction);
       try {
-        // storeTransactionData({
-        //   address: account,
-        //   fromAmount: inAmount,
-        //   toAmount: 0,
-        //   fromChain: 3,
-        //   toChain: 3,
-        //   txHash: state.transaction.hash,
-        //   fromCurrency: tokenIn.symbol,
-        //   toCurrency: tokenOut.symbol,
-        //   status: "pending",
-        //   bridge: "hop",
-        //   country: "LK",
-        //   partnerKey: "",
-        //   txData: state.transaction,
-        // });
+        storeTransactionData({
+          address: account,
+          fromAmount: inAmount,
+          toAmount: Number(formatTokenAmount(tokenOut, quote?.toAmount ?? 0)),
+          fromChain: tokenIn.chainId,
+          toChain: tokenOut.chainId,
+          txHash: state.transaction.hash,
+          fromCurrency: tokenIn.symbol,
+          toCurrency: tokenOut.symbol,
+          status: "pending",
+          bridge: "hop",
+          country,
+          partnerKey: "",
+          txData: state.transaction,
+        });
       } catch (error) {
         console.log(error);
       }
@@ -245,7 +252,17 @@ export const useExecuteTransaction = () => {
         tokenOut={tokenOut}
       />
     );
-  }, [account, nextScreen, state.transaction, tokenOut]);
+  }, [
+    account,
+    country,
+    inAmount,
+    nextScreen,
+    quote?.toAmount,
+    state.transaction,
+    tokenIn.chainId,
+    tokenIn.symbol,
+    tokenOut,
+  ]);
 
   useEffect(() => {
     if (state.status === "Mining") {

@@ -42,7 +42,7 @@ export const useUpdateQuote = () => {
           fromAddress,
           destinationAddress,
           signal,
-          slippageTolerance
+          slippageTolerance / 100
         );
         removeNotification(id);
         if (signal?.aborted) {

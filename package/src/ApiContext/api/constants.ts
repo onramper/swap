@@ -18,6 +18,11 @@ export const BASE_API = (() => {
   }
 })();
 
+export const ONRAMPER_URL =
+  process.env.STAGE === "prod"
+    ? "https://swap.onramper.com/"
+    : "https://widget.onramper.dev/";
+
 export const isDemoEnv = process.env.STAGE === "demo";
 
 export const SANDBOX_HOSTNAME =
