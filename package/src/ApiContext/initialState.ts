@@ -108,7 +108,6 @@ export type InputInterfaceType = {
 };
 
 export type ApiInterfaceType = {
-  // getCountry: () => void;
   executeStep: (
     step: NextStep,
     params: { [key: string]: any }

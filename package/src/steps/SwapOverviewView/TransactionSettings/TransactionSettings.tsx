@@ -1,10 +1,4 @@
-import React, {
-  useCallback,
-  useContext,
-  useEffect,
-  useRef,
-  useState,
-} from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { TransactionSettingsProps } from "./TransactionSettings.models";
 import commonClasses from "./../../../styles.module.css";
 import classes from "./TransactionSettings.module.css";
@@ -12,9 +6,7 @@ import { ReactComponent as SettingsIcon } from "./../../../icons/settings.svg";
 import { CSSTransition } from "react-transition-group";
 import DropdownCheckableGroup from "../../../common/DropdownCheckableGroup/DropdownCheckableGroup";
 import { ListItem } from "../../../common/DropdownCheckableGroup/DropdownCheckableGroup.models";
-import { NavContext } from "../../../NavContext";
 import { WalletItemData } from "../../../ApiContext/api/types/nextStep";
-import DestinationWalletView from "../DestinationWalletView/DestinationWalletView";
 import ErrorMessage from "../../../common/ErrorMessage/ErrorMessage";
 import BaseInput from "../../../common/Input/BaseInput/BaseInput";
 import { UNISWAP_DEFAULTS as defaultSettings } from "layer2";
@@ -37,7 +29,6 @@ const TransactionSettings: React.FC<TransactionSettingsProps> = (props) => {
   } = useTransactionContext();
   const { selectWalletAddress } = useTransactionCtxWallets();
   const { updateDeadline, updateSlippage } = useTransactionCtxActions();
-  const { nextScreen } = useContext(NavContext);
   const { account: mmAddress } = useLayer2();
 
   const [wallets, setWallets] = useState(computeWallets(ctxWallets, mmAddress));
@@ -74,8 +65,8 @@ const TransactionSettings: React.FC<TransactionSettingsProps> = (props) => {
     }
 
     const slippage = Number(slippageValue);
-    if (slippage < 0 || slippage > 51) {
-      return "Please enter a valid slippage";
+    if (slippage < 0 || slippage > 50) {
+      return "Enter a valid slippage";
     }
   }, [slippageValue]);
 
@@ -118,12 +109,12 @@ const TransactionSettings: React.FC<TransactionSettingsProps> = (props) => {
   //   setDeadlineValue(Number(deadlineValue).toFixed(2));
   // }, [deadlineHasError, deadlineValue, initialDeadlineValue]);
 
-  const goToWalletDestination = useCallback(() => {
-    nextScreen(<DestinationWalletView />);
-    setTimeout(() => {
-      setIsOpen(false);
-    }, 200);
-  }, [nextScreen]);
+  // const goToWalletDestination = useCallback(() => {
+  //   nextScreen(<DestinationWalletView />);
+  //   setTimeout(() => {
+  //     setIsOpen(false);
+  //   }, 200);
+  // }, [nextScreen]);
 
   useEffect(
     () => setWallets(computeWallets(ctxWallets, mmAddress)),
@@ -233,7 +224,7 @@ const TransactionSettings: React.FC<TransactionSettingsProps> = (props) => {
                 items={wallets}
                 idSelected={selectedWalletAddress || ""}
                 onSelect={(item: ListItem) => selectWalletAddress(item.id)}
-                onAdd={goToWalletDestination}
+                onAdd={() => undefined} //{goToWalletDestination}
               />
             </div>
           </div>

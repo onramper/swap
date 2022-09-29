@@ -299,11 +299,14 @@ function storeTransactionData(data: RawData) {
       throw new Error("Invalid transaction hash");
     }
     console.log(JSON.stringify(data));
-    return fetch(`https://ppe.onramper.tech/swap-dev`, {
-      method: "POST",
-      headers,
-      body: JSON.stringify(data),
-    });
+    return fetch(
+      `https://obahsk25dk.execute-api.us-east-1.amazonaws.com/dev/swap-dev`,
+      {
+        method: "POST",
+        headers,
+        body: JSON.stringify(data),
+      }
+    );
   }
 }
 

@@ -7,7 +7,6 @@ import { ItemType } from "../../../ApiContext";
 import Breakdown from "../../../common/Breakdown/Breakdown";
 import { ButtonAction } from "../../../common/Buttons";
 import Footer from "../../../common/Footer";
-import ProgressHeader from "../../../common/Header/ProgressHeader/ProgressHeader";
 import Heading from "../../../common/Heading/Heading";
 import InputDropdown from "../../../common/InputDropdown/InputDropdown";
 import inputClasses from "../../../common/InputDropdown/InputDropdown.module.css";
@@ -42,11 +41,15 @@ import classes from "./DirectSwapView.module.css";
 import { Token } from "../../../web3/lifi";
 import { defaultChainId, defaultToken } from "../../../web3/constants";
 import FallbackIcon from "../../../icons/default-token.svg";
+import TabsHeader from "../../../common/Header/TabsHeader/TabsHeader";
+import tabHeaderClasses from "../../../common/Header/TabsHeader/TabsHeader.module.css";
+import Menu from "../../../common/Header/Menu/Menu";
+import { ONRAMPER_URL } from "../../../ApiContext/api/constants";
 
 const insufficientFundsError =
   "You have insufficient funds to complete this transaction";
 
-const DirectSwapView: React.FC<DirectSwapViewProps> = (props) => {
+const DirectSwapView: React.FC<DirectSwapViewProps> = () => {
   const [swapErrorMessage, setSwapErrorMessage] = useState<string>();
   const { addNotification, removeNotification } = useWidgetNotifications();
   const {
@@ -146,11 +149,6 @@ const DirectSwapView: React.FC<DirectSwapViewProps> = (props) => {
       setLocalInAmount(formatTokenAmount(localTokenIn, tokenInBalance));
     }
   }, [localTokenIn, tokenInBalance]);
-
-  const onBackClick = () => {
-    onBeforeUnload();
-    updateQuote(inAmount);
-  };
 
   const handleErrorMessage = useCallback(() => {
     if (!notificationId && isInsufficientFunds) {
@@ -288,9 +286,26 @@ const DirectSwapView: React.FC<DirectSwapViewProps> = (props) => {
       isQuoteError
     );
   };
+
+  const onTabItemClick = (index: number, label?: string) => {
+    if (label?.includes("Sell")) {
+      window.location.replace(`${ONRAMPER_URL}?initScreen=sell`);
+    }
+    if (label?.includes("Buy")) {
+      window.location.replace(`${ONRAMPER_URL}`);
+    }
+  };
+
   return (
     <div className={commonClasses.view}>
-      <ProgressHeader onBackClick={onBackClick} percentage={props.progress} />
+      <TabsHeader
+        tabs={["Swap", "Buy", "Sell"]}
+        tabSelected={0}
+        onClickItem={onTabItemClick}
+        onMenuClick={() =>
+          nextScreen(<Menu className={tabHeaderClasses["tabs-header-menu"]} />)
+        }
+      />
       <main className={`${commonClasses.body} ${classes["wrapper"]}`}>
         <div className={classes["top-section"]}>
           <Heading className={classes.heading} text={heading} />
@@ -373,7 +388,7 @@ const DirectSwapView: React.FC<DirectSwapViewProps> = (props) => {
                   className={classes.buttonInGroup}
                   text={
                     isInsufficientFunds
-                      ? `Insufficient ${tokenIn?.symbol} balance`
+                      ? `Insufficient ${tokenIn?.symbol ?? ""} balance`
                       : "Swap Now"
                   }
                   onClick={executeTransaction}
