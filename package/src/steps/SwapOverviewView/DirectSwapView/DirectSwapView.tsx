@@ -299,8 +299,8 @@ const DirectSwapView: React.FC<DirectSwapViewProps> = () => {
   return (
     <div className={commonClasses.view}>
       <TabsHeader
-        tabs={["Swap", "Buy", "Sell"]}
-        tabSelected={0}
+        tabs={["Buy", "Sell", "Swap"]}
+        tabSelected={2}
         onClickItem={onTabItemClick}
         onMenuClick={() =>
           nextScreen(<Menu className={tabHeaderClasses["tabs-header-menu"]} />)
