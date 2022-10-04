@@ -7,7 +7,6 @@ import { ItemType } from "../../../ApiContext";
 import Breakdown from "../../../common/Breakdown/Breakdown";
 import { ButtonAction } from "../../../common/Buttons";
 import Footer from "../../../common/Footer";
-import Heading from "../../../common/Heading/Heading";
 import InputDropdown from "../../../common/InputDropdown/InputDropdown";
 import inputClasses from "../../../common/InputDropdown/InputDropdown.module.css";
 import OverlayPicker from "../../../common/OverlayPicker/OverlayPicker";
@@ -94,7 +93,7 @@ const DirectSwapView: React.FC<DirectSwapViewProps> = () => {
   const heading =
     localTokenIn?.symbol && localTokenOut?.symbol
       ? `Swap ${localTokenIn?.symbol} for ${localTokenOut?.symbol}`
-      : `Swap`;
+      : `How much do you want to swap?`;
   const [notificationId, setNotificationId] = useState<string | undefined>();
   const debouncedUpdateQuote = useDebouncedCallback(updateQuote, 600);
   const [isInsufficientFunds, setIsInsufficientFunds] = useState(false);
@@ -308,7 +307,7 @@ const DirectSwapView: React.FC<DirectSwapViewProps> = () => {
       />
       <main className={`${commonClasses.body} ${classes["wrapper"]}`}>
         <div className={classes["top-section"]}>
-          <Heading className={classes.heading} text={heading} />
+          <div className={classes["heading"]}>{heading}</div>
           <TransactionSettings className={classes["settings"]} />
         </div>
         <WidgetNotification />
