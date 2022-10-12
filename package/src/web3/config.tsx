@@ -2,10 +2,7 @@ import {
   Config,
   useEthers,
   DAppProvider,
-  Ropsten,
-  Rinkeby,
   Mainnet,
-  Kovan,
   Goerli,
 } from "@usedapp/core";
 import React, { createContext, ReactNode, useContext } from "react";
@@ -17,9 +14,6 @@ export const config: Config = {
   autoConnect: false,
   readOnlyUrls: {
     [Mainnet.chainId]: `https://mainnet.infura.io/v3/${infuraProjectId}`,
-    [Ropsten.chainId]: `https://ropsten.infura.io/v3/${infuraProjectId}`,
-    [Rinkeby.chainId]: `https://rinkeby.infura.io/v3/${infuraProjectId}`,
-    [Kovan.chainId]: `https://kovan.infura.io/v3/${infuraProjectId}`,
     [Goerli.chainId]: `https://goerli.infura.io/v3/${infuraProjectId}`,
   },
   notifications: {

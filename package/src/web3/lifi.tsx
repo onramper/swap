@@ -21,21 +21,6 @@ const lifiConfig: ConfigUpdate = {
 export const supportedChains = [
   { name: "Mainnet", coin: "ETH", id: 1 },
   {
-    name: "Ropsten",
-    coin: "ETH",
-    id: 3,
-  },
-  {
-    name: "Rinkeby",
-    coin: "ETH",
-    id: 4,
-  },
-  {
-    name: "Kovan",
-    coin: "ETH",
-    id: 42,
-  },
-  {
     name: "Goerli",
     coin: "ETH",
     id: 5,
