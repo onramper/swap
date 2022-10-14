@@ -69,7 +69,6 @@ const APIProvider: React.FC<APIProviderType> = (props) => {
   const {
     defaultAmount = 100,
     defaultAddrs = {},
-    API_KEY,
     isAddressEditable = true,
   } = props;
 
@@ -120,10 +119,10 @@ const APIProvider: React.FC<APIProviderType> = (props) => {
   const [state, dispatch] = useReducer(mainReducer, iniState);
 
   // INITIALIZING AUTHENTICATION
-  useEffect(() => {
-    if (!API_KEY) throw new Error("API KEY NOT PROVIDED");
-    API.authenticate(API_KEY);
-  }, [API_KEY]);
+  // useEffect(() => {
+  //   if (!API_KEY) throw new Error("API KEY NOT PROVIDED");
+  //   API.authenticate(API_KEY);
+  // }, [API_KEY]);
 
   const addData = useCallback(
     (data: any) =>
