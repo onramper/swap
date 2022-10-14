@@ -68,7 +68,7 @@ function App() {
     height: "100%",
     backgroundColor: inIframe() ? "transparent" : "whitesmoke",
   } as React.CSSProperties;
-
+  console.log(apiKey);
   return (
     <>
       <div style={style}>
