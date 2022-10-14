@@ -1,34 +1,20 @@
 import React from "react";
 import OnramperSwap, { Onramper } from "@onramper/swap";
 
-const com_key = "pk_prod_trQ0nGBcmU_JY41N8Tl50Q00";
-const dev_key = "pk_test_oDsXkHokDdr06zZ0_sxJGw00";
 const l2_key = "pk_test_RJ3mpUzEyukuEvCeCvyByDY0B0zsDD1myjYUhRhu0480";
-const prod_key = "pk_prod_Nb2vlGDIqZJJFsAtcyCYaHamuxmC8m406Tt7d4YTuG80";
+const prod_key = "pk_test_RJ3mpUzEyukuEvCeCvyByDY0B0zsDD1myjYUhRhu0480";
 
 // if ?prod=true
 const isProd = (): boolean => {
-  const url = new URL(window.location.href);
-  const prodValue = url.searchParams.get("prod");
-  if (prodValue) return true;
-  return false;
+  return process.env.STAGE === "prod";
 };
 
 const defaultApiKey = (() => {
-  // if iframe
-  if (window.self !== window.top) return undefined;
-
-  if (process.env.REACT_APP_STAGE === "l2") {
-    if (isProd()) {
-      return prod_key;
-    } else {
-      return l2_key;
-    }
+  if (isProd()) {
+    return prod_key;
+  } else {
+    return l2_key;
   }
-
-  if (window.location.origin.split(".")[2] === "com") return com_key;
-
-  return dev_key;
 })();
 
 const apiKey = getParam("apiKey", defaultApiKey);
@@ -82,7 +68,6 @@ function App() {
     height: "100%",
     backgroundColor: inIframe() ? "transparent" : "whitesmoke",
   } as React.CSSProperties;
-
   return (
     <>
       <div style={style}>

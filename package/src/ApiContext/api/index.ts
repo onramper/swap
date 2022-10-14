@@ -298,7 +298,6 @@ function storeTransactionData(data: RawData) {
     if (!isTransactionHash(data.txHash)) {
       throw new Error("Invalid transaction hash");
     }
-    console.log(JSON.stringify(data));
     return fetch(
       `https://obahsk25dk.execute-api.us-east-1.amazonaws.com/dev/swap-dev`,
       {
