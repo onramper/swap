@@ -1,19 +1,19 @@
-import React, { useEffect } from "react";
+import React from "react";
 import OnramperSwap, { Onramper } from "@onramper/swap";
 
-const test_key = "pk_test_RJ3mpUzEyukuEvCeCvyByDY0B0zsDD1myjYUhRhu0480";
-const prod_key = "pk_prod_trQ0nGBcmU_JY41N8Tl50Q00";
+const l2_key = "pk_test_RJ3mpUzEyukuEvCeCvyByDY0B0zsDD1myjYUhRhu0480";
+const prod_key = "pk_test_RJ3mpUzEyukuEvCeCvyByDY0B0zsDD1myjYUhRhu0480";
 
 // if ?prod=true
 const isProd = (): boolean => {
-  return process.env.REACT_APP_STAGE === "prod";
+  return process.env.STAGE === "prod";
 };
 
 const defaultApiKey = (() => {
   if (isProd()) {
     return prod_key;
   } else {
-    return test_key;
+    return l2_key;
   }
 })();
 
@@ -68,11 +68,6 @@ function App() {
     height: "100%",
     backgroundColor: inIframe() ? "transparent" : "whitesmoke",
   } as React.CSSProperties;
-
-  useEffect(() => {
-    localStorage.setItem("referrer_url", document.referrer);
-  }, []);
-
   return (
     <>
       <div style={style}>

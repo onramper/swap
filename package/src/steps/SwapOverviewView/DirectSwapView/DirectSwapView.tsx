@@ -287,23 +287,10 @@ const DirectSwapView: React.FC<DirectSwapViewProps> = () => {
   };
 
   const onTabItemClick = (index: number, label?: string) => {
-    if (
-      window.localStorage.getItem("referrer_url")?.includes("widget.onramper")
-    )
-      window.history.back();
-
     if (label?.includes("Sell")) {
-      // if (
-      //   window.localStorage.getItem("referrer_url")?.includes("widget.onramper")
-      // )
-      //   window.history.back();
       window.location.replace(`${ONRAMPER_URL}?initScreen=sell`);
     }
     if (label?.includes("Buy")) {
-      // if (
-      //   window.localStorage.getItem("referrer_url")?.includes("widget.onramper")
-      // )
-      //   window.history.back();
       window.location.replace(`${ONRAMPER_URL}`);
     }
   };
