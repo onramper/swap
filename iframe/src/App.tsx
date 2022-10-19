@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import OnramperSwap, { Onramper } from "@onramper/swap";
 
 const test_key = "pk_test_RJ3mpUzEyukuEvCeCvyByDY0B0zsDD1myjYUhRhu0480";
@@ -70,6 +70,11 @@ function App() {
     height: "100%",
     backgroundColor: inIframe() ? "transparent" : "whitesmoke",
   } as React.CSSProperties;
+
+  useEffect(() => {
+    localStorage.setItem("referrer_url", document.referrer);
+  }, []);
+
   return (
     <>
       <div style={style}>
