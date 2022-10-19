@@ -288,10 +288,14 @@ const DirectSwapView: React.FC<DirectSwapViewProps> = () => {
 
   const onTabItemClick = (index: number, label?: string) => {
     if (label?.includes("Sell")) {
-      window.location.replace(`${ONRAMPER_URL}?initScreen=sell`);
+      window.location.replace(
+        `${ONRAMPER_URL}${localStorage.getItem("swap_params")}&initScreen=sell`
+      );
     }
     if (label?.includes("Buy")) {
-      window.location.replace(`${ONRAMPER_URL}`);
+      window.location.replace(
+        `${ONRAMPER_URL}${localStorage.getItem("swap_params")}`
+      );
     }
   };
 
