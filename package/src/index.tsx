@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import ReactDOM from "react-dom";
 import styles from "./styles.module.css";
 // import BuyCryptoView from "./BuyCryptoView";
@@ -46,6 +46,11 @@ const OnramperSwap: React.FC<OnramperSwapProps> = (props) => {
     gtmId: GTM_ID,
     dataLayer: { apiKey: props.API_KEY },
   };
+
+  useEffect(() => {
+    localStorage.setItem("swap_params", window.location.search);
+    localStorage.setItem("referrer", document.referrer);
+  }, []);
 
   return (
     <BrowserRouter>
