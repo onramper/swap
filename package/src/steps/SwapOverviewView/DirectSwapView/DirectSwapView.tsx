@@ -287,15 +287,14 @@ const DirectSwapView: React.FC<DirectSwapViewProps> = () => {
   };
 
   const onTabItemClick = (index: number, label?: string) => {
+    const referrer = localStorage.getItem("referrer");
+    const swapParams = localStorage.getItem("swap_params");
+    const url = ONRAMPER_URL !== referrer ? referrer : ONRAMPER_URL;
     if (label?.includes("Sell")) {
-      window.location.replace(
-        `${ONRAMPER_URL}${localStorage.getItem("swap_params")}&initScreen=sell`
-      );
+      window.location.replace(`${url}${swapParams}&initScreen=sell`);
     }
     if (label?.includes("Buy")) {
-      window.location.replace(
-        `${ONRAMPER_URL}${localStorage.getItem("swap_params")}`
-      );
+      window.location.replace(`${url}${swapParams}`);
     }
   };
 

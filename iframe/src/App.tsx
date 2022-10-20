@@ -9,8 +9,6 @@ const isProd = (): boolean => {
   return process.env.REACT_APP_STAGE === "prod";
 };
 
-localStorage.setItem("swap_params", window.location.search);
-
 const defaultApiKey = (() => {
   if (isProd()) {
     return prod_key;
