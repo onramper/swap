@@ -4,6 +4,9 @@ import {
   DAppProvider,
   Mainnet,
   Goerli,
+  Avalanche,
+  Polygon,
+  BSC,
 } from "@usedapp/core";
 import React, { createContext, ReactNode, useContext } from "react";
 import { useConnectEnsName, useEnsAvatar } from "./hooks/ens";
@@ -15,6 +18,9 @@ export const config: Config = {
   readOnlyUrls: {
     [Mainnet.chainId]: `https://mainnet.infura.io/v3/${infuraProjectId}`,
     [Goerli.chainId]: `https://goerli.infura.io/v3/${infuraProjectId}`,
+    [Avalanche.chainId]: `https://api.avax.network/ext/bc/C/rpc`,
+    [Polygon.chainId]: `https://polygon-rpc.com/`,
+    [BSC.chainId]: `https://bsc-dataseed.binance.org/`,
   },
   notifications: {
     expirationPeriod: 30000,

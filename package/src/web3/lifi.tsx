@@ -25,6 +25,21 @@ export const supportedChains = [
     coin: "ETH",
     id: 5,
   },
+  {
+    name: "Avalanche",
+    coin: "AVAX",
+    id: 43114,
+  },
+  {
+    name: "Polygon",
+    coin: "MATIC",
+    id: 137,
+  },
+  {
+    name: "BSC",
+    coin: "BNB",
+    id: 56,
+  },
 ];
 
 export const lifi = new LIFI(lifiConfig);
