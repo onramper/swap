@@ -63,7 +63,7 @@ export type DataActions =
     }
   | {
       type: ActionTypes.SetQuote;
-      payload: Estimate;
+      payload: Estimate | null;
     }
   | {
       type: ActionTypes.SetTokens;
