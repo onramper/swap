@@ -28,7 +28,7 @@ export const useTransactionCtxActions = () => {
   );
 
   const setQuote = useCallback(
-    (quote: Estimate) => {
+    (quote: Estimate | null) => {
       dispatch({
         type: ActionTypes.SetQuote,
         payload: quote,

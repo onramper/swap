@@ -23,7 +23,7 @@ const OrderCompleteView: React.FC<{
   const [autoPlay, setAutoPlay] = useState(false);
   const { addToken } = useAddTokenToMetamask(props.tokenOut);
   const { removeAllNotifications } = useWidgetNotifications();
-  const { updateInAmount } = useTransactionCtxActions();
+  const { setQuote } = useTransactionCtxActions();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -35,7 +35,7 @@ const OrderCompleteView: React.FC<{
 
   const exitHandler = () => {
     removeAllNotifications();
-    updateInAmount(0);
+    setQuote(null);
     navigate("/", { replace: true });
     onlyScreen(<DirectSwapView />);
   };
