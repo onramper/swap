@@ -11,7 +11,6 @@ const AccountDetails = ({ className }: AccountDetailsProps) => {
   const { account, active } = useLayer2();
   const { ensName, ensAvatar } = useEns();
   const balance = useEtherBalance(account);
-
   return account && active ? (
     <div
       className={`${buttonClasses["list-item"]} ${classes.AccountDetails} ${className}`}

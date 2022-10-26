@@ -224,17 +224,16 @@ export const useExecuteTransaction = () => {
 
   const handleMining = useCallback(async () => {
     if (state.transaction && account) {
-      // console.log(state.transaction);
       try {
         storeTransactionData({
           address: account,
           fromAmount: inAmount,
           toAmount: Number(formatTokenAmount(tokenOut, quote?.toAmount ?? 0)),
-          fromChain: tokenIn.chainId,
-          toChain: tokenOut.chainId,
+          fromChain: tokenIn?.chainId,
+          toChain: tokenOut?.chainId,
           txHash: state.transaction.hash,
-          fromCurrency: tokenIn.symbol,
-          toCurrency: tokenOut.symbol,
+          fromCurrency: tokenIn?.symbol,
+          toCurrency: tokenOut?.symbol,
           status: "pending",
           bridge: "hop",
           country,
@@ -259,8 +258,8 @@ export const useExecuteTransaction = () => {
     nextScreen,
     quote?.toAmount,
     state.transaction,
-    tokenIn.chainId,
-    tokenIn.symbol,
+    tokenIn?.chainId,
+    tokenIn?.symbol,
     tokenOut,
   ]);
 

@@ -38,7 +38,7 @@ import TransactionSettings from "../TransactionSettings/TransactionSettings";
 import { DirectSwapViewProps } from "./DirectSwapView.models";
 import classes from "./DirectSwapView.module.css";
 import { Token } from "../../../web3/lifi";
-import { defaultChainId, defaultToken } from "../../../web3/constants";
+import { defaultChainId } from "../../../web3/constants";
 import FallbackIcon from "../../../icons/default-token.svg";
 import TabsHeader from "../../../common/Header/TabsHeader/TabsHeader";
 import tabHeaderClasses from "../../../common/Header/TabsHeader/TabsHeader.module.css";
@@ -69,17 +69,21 @@ const DirectSwapView: React.FC<DirectSwapViewProps> = () => {
   const [outTokens, setOutTokens] = useState<Token[]>([]);
   const { updateInAmount, updateTokenIn, updateTokenOut } =
     useTransactionCtxActions();
-  const { account, account: metaAddress, active, chainId } = useLayer2();
+  const {
+    account,
+    account: metaAddress,
+    active,
+    chainId,
+    activateBrowserWallet,
+  } = useLayer2();
   const isActive = metaAddress && active;
   useWalletSupportRedirect();
   const { connect, connectionPending } = useConnectWallet();
-
   const ethBalance = useEtherBalance(account) ?? 0;
-  let tokenInBalance = useTokenBalance(localTokenIn?.address, account) ?? 0;
-  if (localTokenIn?.symbol === defaultToken) tokenInBalance = ethBalance;
-  let tokenOutBalance = useTokenBalance(localTokenOut?.address, account) ?? 0;
-  if (localTokenOut?.symbol === defaultToken) tokenOutBalance = ethBalance;
-
+  const tokenInBalance =
+    useTokenBalance(localTokenIn?.address, account) ?? ethBalance;
+  const tokenOutBalance =
+    useTokenBalance(localTokenOut?.address, account) ?? ethBalance;
   const { backScreen, nextScreen } = useNav();
   const {
     updateQuote,
@@ -107,11 +111,14 @@ const DirectSwapView: React.FC<DirectSwapViewProps> = () => {
   }, [tokenInBalance, localInAmount, localTokenIn, account, localTokenOut]);
 
   useEffect(() => {
-    getTokens([chainId ?? defaultChainId]);
-  }, [getTokens, chainId]);
+    activateBrowserWallet();
+    if (chainId) {
+      getTokens([chainId]);
+    }
+  }, [getTokens, chainId, activateBrowserWallet]);
 
   useEffect(() => {
-    if (tokens) {
+    if (Object.keys(tokens).length !== 0) {
       setLocalTokenIn(tokens[chainId ?? defaultChainId]?.[0]);
       setLocalTokenOut(null);
       setInTokens(tokens[chainId ?? defaultChainId]);
@@ -210,7 +217,7 @@ const DirectSwapView: React.FC<DirectSwapViewProps> = () => {
   );
 
   const openInTokens = useCallback(() => {
-    if (inTokens.length > 1) {
+    if (inTokens.length > 0) {
       nextScreen(
         <OverlayPicker
           name="inTokens"
@@ -236,7 +243,7 @@ const DirectSwapView: React.FC<DirectSwapViewProps> = () => {
   }, [inTokens, localTokenIn?.name, nextScreen, handleItemClick]);
 
   const openOutTokens = useCallback(() => {
-    if (outTokens.length > 1) {
+    if (outTokens.length > 0) {
       nextScreen(
         <OverlayPicker
           name="outTokens"
@@ -325,7 +332,7 @@ const DirectSwapView: React.FC<DirectSwapViewProps> = () => {
           }
           className={inputClasses["swap-screen"]}
           hint={`Balance: ${
-            tokenInBalance
+            localTokenIn && tokenInBalance
               ? trimLargeNumber(
                   formatTokenAmount(localTokenIn, tokenInBalance),
                   4
@@ -346,10 +353,10 @@ const DirectSwapView: React.FC<DirectSwapViewProps> = () => {
 
         <InputDropdown
           label={"You receive"}
-          value={formattedOutputAmount}
+          value={trimLargeNumber(formattedOutputAmount, 6)}
           className={inputClasses["swap-screen"]}
           hint={`Balance: ${
-            tokenOutBalance
+            localTokenOut && tokenOutBalance
               ? trimLargeNumber(
                   formatTokenAmount(localTokenOut, tokenOutBalance),
                   4
