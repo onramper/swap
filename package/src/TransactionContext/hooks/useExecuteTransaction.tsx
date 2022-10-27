@@ -247,7 +247,7 @@ export const useExecuteTransaction = () => {
     nextScreen(
       <OrderCompleteView
         title="Success! Your Swap has been executed."
-        description="You will receive an email when the swap is complete and the crypto has arrived in your wallet. "
+        description="You will receive a browser notification when the swap is complete and the crypto has arrived in your wallet."
         tokenOut={tokenOut}
       />
     );
