@@ -71,6 +71,8 @@ export type CollectedStateType = {
   supportBuy: boolean;
   isAmountEditable?: boolean;
   staticRouting?: StaticRoutingItemType[];
+  queryParams?: string;
+  referrer?: string;
   [key: string]: any;
 };
 
