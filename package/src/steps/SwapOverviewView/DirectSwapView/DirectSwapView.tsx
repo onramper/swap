@@ -3,7 +3,6 @@ import { useEtherBalance, useTokenBalance } from "@usedapp/core";
 import { isMetamaskEnabled } from "layer2";
 import { nanoid } from "nanoid";
 import { useDebouncedCallback } from "use-debounce";
-import { ItemType } from "../../../ApiContext";
 import Breakdown from "../../../common/Breakdown/Breakdown";
 import { ButtonAction } from "../../../common/Buttons";
 import Footer from "../../../common/Footer";
@@ -12,6 +11,7 @@ import inputClasses from "../../../common/InputDropdown/InputDropdown.module.css
 import OverlayPicker from "../../../common/OverlayPicker/OverlayPicker";
 import { useConnectWallet, useWalletSupportRedirect } from "../../../hooks";
 import { useNav } from "../../../NavContext";
+import { useAPI, ItemType } from "../../../ApiContext";
 import {
   NotificationType,
   useWidgetNotifications,
@@ -85,6 +85,8 @@ const DirectSwapView: React.FC<DirectSwapViewProps> = () => {
   const tokenOutBalance =
     useTokenBalance(localTokenOut?.address, account) ?? ethBalance;
   const { backScreen, nextScreen } = useNav();
+  const { collected } = useAPI();
+  const { referrer, queryParams } = collected;
   const {
     updateQuote,
     loading: quoteLoading,
@@ -294,14 +296,12 @@ const DirectSwapView: React.FC<DirectSwapViewProps> = () => {
   };
 
   const onTabItemClick = (index: number, label?: string) => {
-    const referrer = localStorage.getItem("referrer");
-    const swapParams = localStorage.getItem("swap_params");
     const url = ONRAMPER_URL !== referrer ? referrer : ONRAMPER_URL;
     if (label?.includes("Sell")) {
-      window.location.replace(`${url}${swapParams}&initScreen=sell`);
+      window.location.replace(`${url}${queryParams}&initScreen=sell`);
     }
     if (label?.includes("Buy")) {
-      window.location.replace(`${url}${swapParams}`);
+      window.location.replace(`${url}${queryParams}`);
     }
   };
 

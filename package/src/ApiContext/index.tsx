@@ -63,6 +63,8 @@ interface APIProviderType {
   recommendedCryptoCurrencies?: string[];
   darkMode?: boolean;
   selectGatewayBy?: string | "price" | "performance";
+  referrer?: string;
+  queryParams?: string;
 }
 
 const APIProvider: React.FC<APIProviderType> = (props) => {
@@ -95,11 +97,13 @@ const APIProvider: React.FC<APIProviderType> = (props) => {
         ? arrayUnique(props.recommendedCryptoCurrencies)
         : undefined,
       selectGatewayBy: props.selectGatewayBy,
+      queryParams: props.queryParams,
+      referrer: props.referrer,
     };
   }, [
+    defaultAmount,
     defaultAddrs,
     isAddressEditable,
-    defaultAmount,
     props.themeColor,
     props.amountInCrypto,
     props.partnerContext,
@@ -110,6 +114,8 @@ const APIProvider: React.FC<APIProviderType> = (props) => {
     props.isAmountEditable,
     props.recommendedCryptoCurrencies,
     props.selectGatewayBy,
+    props.queryParams,
+    props.referrer,
   ]);
 
   const iniState: StateType = {
