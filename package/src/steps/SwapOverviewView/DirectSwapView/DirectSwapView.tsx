@@ -298,9 +298,10 @@ const DirectSwapView: React.FC<DirectSwapViewProps> = () => {
   const onTabItemClick = (index: number, label?: string) => {
     const url = ONRAMPER_URL !== referrer ? referrer : ONRAMPER_URL;
     if (label?.includes("Sell")) {
-      const params = queryParams?.length
-        ? "&initScreen=sell"
-        : "?initScreen=sell";
+      const params =
+        queryParams && queryParams.length > 0
+          ? `${queryParams}&initScreen=sell`
+          : "?initScreen=sell";
       window.location.replace(`${url}${params}`);
     }
     if (label?.includes("Buy")) {
